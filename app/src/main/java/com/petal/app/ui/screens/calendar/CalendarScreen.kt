@@ -124,7 +124,7 @@ fun CalendarScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Row(modifier = Modifier.fillMaxWidth()) {
-                            DayOfWeek.entries.forEach { day ->
+                            DayOfWeek.values().forEach { day ->
                                 Text(
                                     text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
                                     style = MaterialTheme.typography.labelSmall,

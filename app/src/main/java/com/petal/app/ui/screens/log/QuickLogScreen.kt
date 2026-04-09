@@ -228,11 +228,12 @@ fun QuickLogScreen(
                 isLoading = uiState.isSaving
             )
 
-            if (uiState.editingEntryId != null) {
+            val entryIdToDelete = uiState.editingEntryId
+            if (entryIdToDelete != null) {
                 Spacer(modifier = Modifier.height(12.dp))
                 PetalButton(
                     text = "Delete entry",
-                    onClick = { viewModel.deleteEntry(uiState.editingEntryId!!, onNavigateBack) },
+                    onClick = { viewModel.deleteEntry(entryIdToDelete, onNavigateBack) },
                     isOutlined = true,
                     containerColor = MaterialTheme.colorScheme.error
                 )

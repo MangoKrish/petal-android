@@ -247,13 +247,13 @@ private fun ThemeModeSelector(
             SingleChoiceSegmentedButtonRow(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                ThemeMode.entries.forEachIndexed { index, mode ->
+                ThemeMode.values().toList().forEachIndexed { index, mode ->
                     SegmentedButton(
-                        checked = selectedMode == mode,
-                        onCheckedChange = { onSelected(mode) },
+                        selected = selectedMode == mode,
+                        onClick = { onSelected(mode) },
                         shape = SegmentedButtonDefaults.itemShape(
                             index = index,
-                            count = ThemeMode.entries.size
+                            count = ThemeMode.values().size
                         )
                     ) {
                         Text(

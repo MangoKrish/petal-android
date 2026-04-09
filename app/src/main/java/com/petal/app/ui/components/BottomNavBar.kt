@@ -61,7 +61,7 @@ fun BottomNavBar(
         tonalElevation = 4.dp
     ) {
         navItems.forEach { item ->
-            val isSelected = currentRoute == item.route || (item.route == Screen.QuickLog.baseRoute && currentRoute == Screen.QuickLog.route)
+            val isSelected = currentRoute == item.route || (currentRoute?.startsWith(item.route.split("?")[0]) == true)
             val isLogButton = item.route == Screen.QuickLog.baseRoute
 
             NavigationBarItem(
