@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,14 +47,14 @@ fun CalendarDayCell(
 
     Box(
         modifier = modifier
-            .aspectRatio(1f)
             .padding(2.dp)
-            .clip(CircleShape)
+            .aspectRatio(0.9f)
+            .clip(RoundedCornerShape(16.dp))
             .background(bgColor)
             .border(
                 width = if (isSelected || dayInfo.isToday) 2.dp else 0.dp,
                 color = borderColor,
-                shape = CircleShape
+                shape = RoundedCornerShape(16.dp)
             )
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center

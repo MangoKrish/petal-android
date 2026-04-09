@@ -32,7 +32,7 @@ private val navItems = listOf(
         unselectedIcon = Icons.Outlined.CalendarMonth
     ),
     NavItem(
-        route = Screen.QuickLog.route,
+        route = Screen.QuickLog.baseRoute,
         label = "Log",
         selectedIcon = Icons.Filled.AddCircle,
         unselectedIcon = Icons.Outlined.AddCircle
@@ -61,8 +61,8 @@ fun BottomNavBar(
         tonalElevation = 4.dp
     ) {
         navItems.forEach { item ->
-            val isSelected = currentRoute == item.route
-            val isLogButton = item.route == Screen.QuickLog.route
+            val isSelected = currentRoute == item.route || (item.route == Screen.QuickLog.baseRoute && currentRoute == Screen.QuickLog.route)
+            val isLogButton = item.route == Screen.QuickLog.baseRoute
 
             NavigationBarItem(
                 selected = isSelected,

@@ -21,6 +21,9 @@ interface CycleEntryDao {
     @Query("SELECT * FROM cycle_entries WHERE id = :entryId AND userId = :userId")
     suspend fun getEntry(userId: String, entryId: String): CycleEntry?
 
+    @Query("SELECT * FROM cycle_entries WHERE userId = :userId ORDER BY start DESC LIMIT 1")
+    suspend fun getLatestEntry(userId: String): CycleEntry?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntry(entry: CycleEntry)
 

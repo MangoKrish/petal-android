@@ -23,7 +23,8 @@ data class CalendarDayInfo(
     val isOvulationDay: Boolean = false,
     val isToday: Boolean = false,
     val phase: CyclePhase? = null,
-    val hasEntry: Boolean = false
+    val hasEntry: Boolean = false,
+    val entryId: String? = null
 )
 
 data class CalendarUiState(
@@ -124,6 +125,11 @@ class CalendarViewModel @Inject constructor(
             } else null
 
             val isFertile = !current.isBefore(fertileStart) && !current.isAfter(fertileEnd)
+            val matchingEntry = entries.firstOrNull { entry ->
+                val s = LocalDate.parse(entry.start)
+                val e = LocalDate.parse(entry.end)
+                !current.isBefore(s) && !current.isAfter(e)
+            }
 
             days.add(
                 CalendarDayInfo(
@@ -134,11 +140,8 @@ class CalendarViewModel @Inject constructor(
                     isOvulationDay = current == ovulationDate,
                     isToday = current == today,
                     phase = phase,
-                    hasEntry = entries.any { entry ->
-                        val s = LocalDate.parse(entry.start)
-                        val e = LocalDate.parse(entry.end)
-                        !current.isBefore(s) && !current.isAfter(e)
-                    }
+                    hasEntry = matchingEntry != null,
+                    entryId = matchingEntry?.id
                 )
             )
             current = current.plusDays(1)

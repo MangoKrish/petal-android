@@ -8,7 +8,21 @@ sealed class Screen(val route: String) {
     data object ImportData : Screen("import_data")
     data object Dashboard : Screen("dashboard")
     data object Calendar : Screen("calendar")
-    data object QuickLog : Screen("quick_log")
+    data object QuickLog : Screen("quick_log?date={date}&entryId={entryId}") {
+        const val baseRoute = "quick_log"
+
+        fun createRoute(
+            date: String? = null,
+            entryId: String? = null
+        ): String {
+            val params = buildList {
+                if (date != null) add("date=$date")
+                if (entryId != null) add("entryId=$entryId")
+            }
+
+            return if (params.isEmpty()) baseRoute else "$baseRoute?${params.joinToString("&")}"
+        }
+    }
     data object Partner : Screen("partner")
     data object PartnerSetup : Screen("partner_setup")
     data object Caregiver : Screen("caregiver")

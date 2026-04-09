@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.petal.app.ui.theme.ThemeMode
 import com.petal.app.ui.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,12 +94,9 @@ fun SettingsScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            SettingsToggle(
-                icon = Icons.Default.DarkMode,
-                title = "Dark mode",
-                subtitle = "Switch to dark theme",
-                checked = uiState.isDarkMode,
-                onCheckedChange = { viewModel.updateDarkMode(it) }
+            ThemeModeSelector(
+                selectedMode = uiState.themeMode,
+                onSelected = viewModel::updateThemeMode
             )
 
             SettingsToggle(
@@ -211,6 +209,64 @@ fun SettingsScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun ThemeModeSelector(
+    selectedMode: ThemeMode,
+    onSelected: (ThemeMode) -> Unit
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.Palette,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text("App theme", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        "Choose light, dark, or follow your phone setting",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ThemeMode.entries.forEachIndexed { index, mode ->
+                    SegmentedButton(
+                        checked = selectedMode == mode,
+                        onCheckedChange = { onSelected(mode) },
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = ThemeMode.entries.size
+                        )
+                    ) {
+                        Text(
+                            when (mode) {
+                                ThemeMode.SYSTEM -> "System"
+                                ThemeMode.LIGHT -> "Light"
+                                ThemeMode.DARK -> "Dark"
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -15,6 +15,7 @@ import com.petal.app.data.model.User
 import com.petal.app.data.repository.AuthRepository
 import com.petal.app.data.repository.PartnerRepository
 import com.petal.app.domain.NotificationScheduler
+import com.petal.app.ui.theme.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ data class SettingsUiState(
     val user: User? = null,
     val notificationPrefs: NotificationPreferences = NotificationPreferences(),
     val shareLinks: List<SharedLink> = emptyList(),
-    val isDarkMode: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val isDiscreetMode: Boolean = false,
     val error: String? = null
 )
@@ -40,6 +41,9 @@ class SettingsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    val themeMode: Flow<ThemeMode> = dataStore.data.map { prefs ->
+        ThemeMode.fromStorage(prefs[PREF_THEME_MODE])
+    }.distinctUntilChanged()
 
     init {
         loadSettings()
@@ -61,7 +65,7 @@ class SettingsViewModel @Inject constructor(
                     inAppEnabled = prefs[PREF_IN_APP] ?: true,
                     quietMode = prefs[PREF_QUIET_MODE] ?: false
                 )
-                val isDark = prefs[PREF_DARK_MODE] ?: false
+                val themeMode = ThemeMode.fromStorage(prefs[PREF_THEME_MODE])
                 val isDiscreet = prefs[PREF_DISCREET_MODE] ?: false
 
                 _uiState.update {
@@ -70,7 +74,7 @@ class SettingsViewModel @Inject constructor(
                         user = user,
                         notificationPrefs = notifPrefs,
                         shareLinks = links,
-                        isDarkMode = isDark,
+                        themeMode = themeMode,
                         isDiscreetMode = isDiscreet
                     )
                 }
@@ -104,10 +108,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateDarkMode(enabled: Boolean) {
+    fun updateThemeMode(themeMode: ThemeMode) {
         viewModelScope.launch {
-            dataStore.edit { it[PREF_DARK_MODE] = enabled }
-            _uiState.update { it.copy(isDarkMode = enabled) }
+            dataStore.edit { it[PREF_THEME_MODE] = themeMode.name }
+            _uiState.update { it.copy(themeMode = themeMode) }
         }
     }
 
@@ -166,7 +170,7 @@ class SettingsViewModel @Inject constructor(
         val PREF_SYMPTOM_TIME = stringPreferencesKey("symptom_time")
         val PREF_IN_APP = booleanPreferencesKey("in_app_enabled")
         val PREF_QUIET_MODE = booleanPreferencesKey("quiet_mode")
-        val PREF_DARK_MODE = booleanPreferencesKey("dark_mode")
+        val PREF_THEME_MODE = stringPreferencesKey("theme_mode")
         val PREF_DISCREET_MODE = booleanPreferencesKey("discreet_mode")
     }
 }

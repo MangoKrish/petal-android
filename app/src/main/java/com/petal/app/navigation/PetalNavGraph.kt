@@ -8,10 +8,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.petal.app.ui.components.BottomNavBar
 import com.petal.app.ui.screens.auth.ForgotPasswordScreen
 import com.petal.app.ui.screens.auth.LoginScreen
@@ -60,6 +62,7 @@ fun PetalNavGraph(
         Screen.Dashboard.route,
         Screen.Calendar.route,
         Screen.QuickLog.route,
+        Screen.QuickLog.baseRoute,
         Screen.Partner.route,
         Screen.Settings.route
     )
@@ -152,17 +155,38 @@ fun PetalNavGraph(
                     onNavigateToRecommendations = { navController.navigate(Screen.Recommendations.route) },
                     onNavigateToCharts = { navController.navigate(Screen.Charts.route) },
                     onNavigateToEducation = { navController.navigate(Screen.Education.route) },
-                    onNavigateToQuickLog = { navController.navigate(Screen.QuickLog.route) }
+                    onNavigateToQuickLog = { navController.navigate(Screen.QuickLog.createRoute()) }
                 )
             }
 
             composable(Screen.Calendar.route) {
                 CalendarScreen(
-                    onNavigateToLog = { navController.navigate(Screen.QuickLog.route) }
+                    onNavigateToLog = { dayInfo ->
+                        navController.navigate(
+                            Screen.QuickLog.createRoute(
+                                date = dayInfo?.date?.toString(),
+                                entryId = dayInfo?.entryId
+                            )
+                        )
+                    }
                 )
             }
 
-            composable(Screen.QuickLog.route) {
+            composable(
+                route = Screen.QuickLog.route,
+                arguments = listOf(
+                    navArgument("date") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                    navArgument("entryId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) {
                 QuickLogScreen(
                     onNavigateBack = { navController.popBackStack() }
                 )

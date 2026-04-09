@@ -70,6 +70,16 @@ fun QuickLogScreen(
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        if (uiState.editingEntryId != null) {
+                            "Your saved details are loaded here so you can update them quickly."
+                        } else {
+                            "We remember your last logged details to save time. You can change anything below."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Row(

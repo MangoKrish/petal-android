@@ -26,6 +26,9 @@ class CycleRepository @Inject constructor(
     suspend fun getEntry(userId: String, entryId: String): CycleEntry? =
         cycleEntryDao.getEntry(userId, entryId)
 
+    suspend fun getLatestEntry(userId: String): CycleEntry? =
+        cycleEntryDao.getLatestEntry(userId)
+
     suspend fun saveEntry(
         userId: String,
         entryId: String? = null,

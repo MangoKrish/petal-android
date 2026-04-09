@@ -1,5 +1,6 @@
 package com.petal.app.ui.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.petal.app.data.model.*
@@ -31,12 +32,95 @@ data class CycleLogUiState(
 
 @HiltViewModel
 class CycleLogViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val authRepository: AuthRepository,
     private val cycleRepository: CycleRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CycleLogUiState())
     val uiState: StateFlow<CycleLogUiState> = _uiState.asStateFlow()
+
+    private val requestedDate = savedStateHandle.get<String>("date")
+    private val requestedEntryId = savedStateHandle.get<String>("entryId")
+
+    init {
+        initializeForm()
+    }
+
+    private fun initializeForm() {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val latestEntry = cycleRepository.getLatestEntry(userId)
+            val initialDate = requestedDate?.let(LocalDate::parse) ?: LocalDate.now()
+
+            if (requestedEntryId != null) {
+                val entry = cycleRepository.getEntry(userId, requestedEntryId) ?: latestEntry
+                if (entry != null) {
+                    applyEntry(entry)
+                } else {
+                    applyRememberedDefaults(initialDate, latestEntry)
+                }
+                return@launch
+            }
+
+            val matchingEntry = cycleRepository.getEntries(userId).firstOrNull { entry ->
+                val start = LocalDate.parse(entry.start)
+                val end = LocalDate.parse(entry.end)
+                !initialDate.isBefore(start) && !initialDate.isAfter(end)
+            }
+
+            if (matchingEntry != null) {
+                applyEntry(matchingEntry)
+            } else {
+                applyRememberedDefaults(initialDate, latestEntry)
+            }
+        }
+    }
+
+    private fun applyEntry(entry: CycleEntry) {
+        _uiState.update {
+            it.copy(
+                startDate = LocalDate.parse(entry.start),
+                endDate = LocalDate.parse(entry.end),
+                cycleLength = entry.cycleLength,
+                flowIntensity = entry.flowIntensity,
+                pain = entry.painLevel,
+                cramps = entry.crampsLevel,
+                cravings = entry.cravingsLevel,
+                mood = entry.moodLevel,
+                headaches = entry.headachesLevel,
+                editingEntryId = entry.id,
+                error = null
+            )
+        }
+    }
+
+    private fun applyRememberedDefaults(date: LocalDate, latestEntry: CycleEntry?) {
+        val start = date
+        val end = latestEntry?.let { remembered ->
+            val previousDuration = (
+                LocalDate.parse(remembered.end).toEpochDay() -
+                    LocalDate.parse(remembered.start).toEpochDay()
+                ).toInt().coerceAtLeast(0)
+            start.plusDays(previousDuration.toLong())
+        } ?: date
+
+        _uiState.update {
+            it.copy(
+                startDate = start,
+                endDate = end,
+                cycleLength = latestEntry?.cycleLength ?: it.cycleLength,
+                flowIntensity = latestEntry?.flowIntensity ?: it.flowIntensity,
+                pain = latestEntry?.painLevel ?: it.pain,
+                cramps = latestEntry?.crampsLevel ?: it.cramps,
+                cravings = latestEntry?.cravingsLevel ?: it.cravings,
+                mood = latestEntry?.moodLevel ?: it.mood,
+                headaches = latestEntry?.headachesLevel ?: it.headaches,
+                editingEntryId = null,
+                error = null
+            )
+        }
+    }
 
     fun updateStartDate(date: LocalDate) {
         _uiState.update { it.copy(startDate = date) }
@@ -72,28 +156,6 @@ class CycleLogViewModel @Inject constructor(
 
     fun updateHeadaches(level: SymptomLevel) {
         _uiState.update { it.copy(headaches = level) }
-    }
-
-    fun loadEntry(entryId: String) {
-        viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
-            val entry = cycleRepository.getEntry(userId, entryId) ?: return@launch
-
-            _uiState.update {
-                it.copy(
-                    startDate = LocalDate.parse(entry.start),
-                    endDate = LocalDate.parse(entry.end),
-                    cycleLength = entry.cycleLength,
-                    flowIntensity = entry.flowIntensity,
-                    pain = entry.painLevel,
-                    cramps = entry.crampsLevel,
-                    cravings = entry.cravingsLevel,
-                    mood = entry.moodLevel,
-                    headaches = entry.headachesLevel,
-                    editingEntryId = entry.id
-                )
-            }
-        }
     }
 
     fun save(onSuccess: () -> Unit) {
