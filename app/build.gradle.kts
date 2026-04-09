@@ -20,7 +20,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_BASE_URL", "\"https://api.petal.health/v1/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://petal-api-mangokrishs-projects.vercel.app/api/v1/\"")
     }
 
     buildTypes {
