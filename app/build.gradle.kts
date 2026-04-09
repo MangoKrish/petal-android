@@ -23,6 +23,19 @@ android {
         buildConfigField("String", "API_BASE_URL", "\"https://petal-api-mangokrishs-projects.vercel.app/api/v1/\"")
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+            enableV4Signing = true
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -34,7 +47,8 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            applicationIdSuffix = ".debug"
+            // applicationIdSuffix removed — was causing install issues
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
