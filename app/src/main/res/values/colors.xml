@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Rose palette -->
+    <color name="rose_50">#FFF1F2</color>
+    <color name="rose_100">#FFE4E6</color>
+    <color name="rose_200">#FECDD3</color>
+    <color name="rose_300">#FDA4AF</color>
+    <color name="rose_400">#FB7185</color>
+    <color name="rose_500">#F43F5E</color>
+    <color name="rose_600">#E11D48</color>
+    <color name="rose_700">#BE123C</color>
+    <color name="rose_800">#9F1239</color>
+    <color name="rose_900">#881337</color>
+
+    <!-- Teal palette -->
+    <color name="teal_50">#F0FDFA</color>
+    <color name="teal_100">#CCFBF1</color>
+    <color name="teal_200">#99F6E4</color>
+    <color name="teal_300">#5EEAD4</color>
+    <color name="teal_400">#2DD4BF</color>
+    <color name="teal_500">#14B8A6</color>
+    <color name="teal_600">#0D9488</color>
+    <color name="teal_700">#0F766E</color>
+
+    <!-- Gold palette -->
+    <color name="gold_50">#FFFBEB</color>
+    <color name="gold_100">#FEF3C7</color>
+    <color name="gold_200">#FDE68A</color>
+    <color name="gold_300">#FCD34D</color>
+    <color name="gold_400">#FBBF24</color>
+    <color name="gold_500">#F59E0B</color>
+    <color name="gold_600">#D97706</color>
+
+    <!-- Lavender palette -->
+    <color name="lavender_50">#FAF5FF</color>
+    <color name="lavender_100">#F3E8FF</color>
+    <color name="lavender_200">#E9D5FF</color>
+    <color name="lavender_300">#D8B4FE</color>
+    <color name="lavender_400">#C084FC</color>
+    <color name="lavender_500">#A855F7</color>
+</resources>

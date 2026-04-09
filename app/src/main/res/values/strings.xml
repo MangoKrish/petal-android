@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Petal</string>
+    <string name="app_tagline">The first period tracker built for couples &amp; caregivers</string>
+
+    <!-- Auth -->
+    <string name="login_title">Welcome back</string>
+    <string name="signup_title">Create account</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="name_label">Name</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="forgot_password_title">Reset password</string>
+    <string name="forgot_password_body">Enter your email address and we will send you a link to reset your password.</string>
+    <string name="send_reset_link">Send reset link</string>
+    <string name="back_to_login">Back to sign in</string>
+    <string name="sign_out">Sign out</string>
+    <string name="or_continue_with">or continue with</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="password_requirement">At least 8 characters</string>
+    <string name="terms_agreement">By continuing, you agree to our Terms of Service and Privacy Policy</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="cycle_day">Day %d</string>
+    <string name="days_until_period">%d days until period</string>
+    <string name="period_expected">Period expected</string>
+    <string name="period_expected_tomorrow">Period expected tomorrow</string>
+    <string name="predictions">Predictions</string>
+    <string name="next_period">Next period</string>
+    <string name="ovulation">Ovulation</string>
+    <string name="fertile_window">Fertile window</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="todays_tip">Today\'s Tip</string>
+    <string name="pattern_insights">Pattern Insights</string>
+    <string name="greeting_hello">Hello, %s</string>
+
+    <!-- Phases -->
+    <string name="phase_menstrual">Menstrual</string>
+    <string name="phase_follicular">Follicular</string>
+    <string name="phase_ovulation">Ovulation</string>
+    <string name="phase_luteal">Luteal</string>
+    <string name="phase_format">%s Phase</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">Calendar</string>
+    <string name="period">Period</string>
+    <string name="predicted">Predicted</string>
+    <string name="fertile">Fertile</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+
+    <!-- Logging -->
+    <string name="log_period">Log Period</string>
+    <string name="edit_entry">Edit Entry</string>
+    <string name="save_entry">Save entry</string>
+    <string name="delete_entry">Delete entry</string>
+    <string name="flow_intensity">Flow intensity</string>
+    <string name="symptoms">Symptoms</string>
+    <string name="cycle_length">Cycle length</string>
+    <string name="start_date">Start date</string>
+    <string name="end_date">End date</string>
+    <string name="pain">Pain</string>
+    <string name="cramps">Cramps</string>
+    <string name="cravings">Cravings</string>
+    <string name="headaches">Headaches</string>
+    <string name="mood">Mood</string>
+    <string name="notes">Notes</string>
+    <string name="entry_saved">Entry saved successfully</string>
+    <string name="entry_deleted">Entry deleted</string>
+
+    <!-- Partner -->
+    <string name="partner_dashboard">Partner Dashboard</string>
+    <string name="invite_partner">Invite Partner</string>
+    <string name="caregiver_guide">Caregiver Guide</string>
+    <string name="support_tips">How to support %s today</string>
+    <string name="partner_setup_title">Set Up Partner Sharing</string>
+    <string name="partner_setup_body">Share curated support tips with your partner so they can understand and help during each phase of your cycle.</string>
+    <string name="partner_code_label">Partner invite code</string>
+    <string name="generate_invite">Generate invite link</string>
+    <string name="copy_link">Copy link</string>
+    <string name="partner_notifications">Partner Notifications</string>
+    <string name="notification_timeline">Timeline</string>
+    <string name="partner_preview">Preview</string>
+    <string name="notification_controls">Controls</string>
+    <string name="what_partner_sees">What Your Partner Sees</string>
+    <string name="privacy_note">Privacy Note</string>
+    <string name="privacy_note_body">Your partner never sees raw cycle data like dates or flow details. They only receive curated tips and support guides. You control exactly what is shared.</string>
+    <string name="notification_types">Notification Types</string>
+    <string name="phase_change_alerts">Phase change alerts</string>
+    <string name="phase_change_alerts_desc">When you enter a new cycle phase</string>
+    <string name="period_reminders">Period approaching</string>
+    <string name="period_reminders_desc">Heads-up when period is approaching</string>
+    <string name="daily_support_tips">Daily support tips</string>
+    <string name="daily_support_tips_desc">How-to-help tips tailored to the phase</string>
+    <string name="mood_updates">Mood updates</string>
+    <string name="mood_updates_desc">Share mood changes (requires explicit opt-in)</string>
+    <string name="caregiver_guides">Caregiver guides</string>
+    <string name="caregiver_guides_desc">Weekly care guidance for your partner</string>
+    <string name="phase_sharing">Phase Sharing</string>
+    <string name="phase_sharing_desc">Choose which phases trigger partner notifications</string>
+    <string name="quiet_hours">Quiet Hours</string>
+    <string name="enable_quiet_hours">Enable quiet hours</string>
+
+    <!-- Insights -->
+    <string name="daily_insights">Daily Insights</string>
+    <string name="recommendations">Recommendations</string>
+    <string name="trends_charts">Trends &amp; Charts</string>
+    <string name="cycle_trends">Cycle Trends</string>
+    <string name="cycle_length_over_time">Cycle Length Over Time</string>
+    <string name="symptom_frequency">Symptom Frequency by Phase</string>
+    <string name="prediction_accuracy">Prediction Accuracy</string>
+    <string name="monthly_summary">Monthly Summary</string>
+    <string name="trend_analysis">Trend Analysis</string>
+    <string name="symptom_insights">Symptom Insights</string>
+    <string name="about_accuracy">About Accuracy</string>
+    <string name="export_data">Export Data</string>
+    <string name="average">Average</string>
+    <string name="shortest">Shortest</string>
+    <string name="longest">Longest</string>
+    <string name="spread">Spread</string>
+    <string name="avg_offset">Avg. offset</string>
+    <string name="within_1_day">Within 1 day</string>
+    <string name="within_3_days">Within 3 days</string>
+
+    <!-- Weekly Overview -->
+    <string name="this_week">This Week</string>
+    <string name="previous_day">Previous day</string>
+    <string name="next_day">Next day</string>
+    <string name="energy">Energy</string>
+    <string name="energy_low">Low energy</string>
+    <string name="energy_moderate">Moderate energy</string>
+    <string name="energy_high">High energy</string>
+
+    <!-- Education -->
+    <string name="education">Education</string>
+    <string name="health_qa">Health Q&amp;A</string>
+    <string name="read_more">Read more</string>
+    <string name="related_articles">Related articles</string>
+
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="notifications">Notifications</string>
+    <string name="privacy">Privacy</string>
+    <string name="sharing">Sharing</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="discreet_mode">Discreet mode</string>
+    <string name="discreet_mode_desc">Hide sensitive content in notifications and app switcher</string>
+    <string name="delete_account">Delete account</string>
+    <string name="data_export">Data &amp; Privacy</string>
+    <string name="about">About Petal</string>
+    <string name="version">Version %s</string>
+    <string name="high_contrast_mode">High contrast mode</string>
+    <string name="high_contrast_desc">Increase color contrast for better visibility</string>
+
+    <!-- Data Export/Import -->
+    <string name="export_your_data">Export Your Data</string>
+    <string name="export_description">Download all your cycle data in portable formats</string>
+    <string name="export_csv">Export CSV</string>
+    <string name="export_csv_desc">Spreadsheet-compatible. Works with Excel, Google Sheets, and most analytics tools.</string>
+    <string name="export_json">Export JSON</string>
+    <string name="export_json_desc">Machine-readable. Ideal for developers or transferring to other apps.</string>
+    <string name="import_data">Import Data</string>
+    <string name="import_description">Bring in data from other apps or Health Connect</string>
+    <string name="import_health_connect">Health Connect</string>
+    <string name="import_health_connect_desc">Import MenstruationRecord data from Android Health Connect</string>
+    <string name="import_csv_json">Import from CSV/JSON</string>
+    <string name="import_csv_json_desc">Import from Flo, Clue, or any standard cycle data file</string>
+    <string name="import_success">Successfully imported %d cycle records</string>
+    <string name="import_error">Error importing data: %s</string>
+    <string name="smart_detection">Smart detection</string>
+    <string name="smart_detection_desc">Petal automatically detects date formats, column layouts, and data structures. Just select your file and we will handle the rest.</string>
+
+    <!-- GDPR -->
+    <string name="gdpr_privacy">Privacy &amp; GDPR</string>
+    <string name="gdpr_full_export">Request full data export</string>
+    <string name="gdpr_full_export_desc">We will email you a complete copy of all data Petal stores about you within 30 days</string>
+    <string name="gdpr_correction">Request data correction</string>
+    <string name="gdpr_correction_desc">If any stored data is inaccurate, request a correction</string>
+    <string name="gdpr_deletion">Request data deletion</string>
+    <string name="gdpr_deletion_desc">Permanently delete all data associated with your account</string>
+    <string name="gdpr_processing">Data processing info</string>
+    <string name="gdpr_processing_desc">View details about how Petal processes your health data</string>
+    <string name="data_storage">Data Storage</string>
+    <string name="data_storage_desc">Your cycle data is stored locally on your device using encrypted storage. When synced, data is encrypted in transit and at rest. Petal never sells or shares your health data with third parties.</string>
+
+    <!-- Onboarding / Import -->
+    <string name="import_title">Import Your Data</string>
+    <string name="import_heading">Bring your cycle history</string>
+    <string name="import_body">Import existing data so Petal can start with accurate predictions. Your data stays private and secure.</string>
+    <string name="preview_import">Preview Import</string>
+    <string name="records_found">%d records found</string>
+    <string name="review_before_import">Review a sample of detected records before importing</string>
+    <string name="import_records">Import %d Records</string>
+    <string name="choose_different_file">Choose a Different File</string>
+    <string name="importing_records">Importing records\u2026</string>
+    <string name="import_complete">Import Complete</string>
+    <string name="import_complete_body">%d cycle records imported successfully. Petal will use this data to generate more accurate predictions right away.</string>
+    <string name="continue_to_petal">Continue to Petal</string>
+    <string name="skip">Skip</string>
+
+    <!-- Health Connect -->
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_desc">Sync cycle, temperature, and sleep data with Android Health Connect</string>
+    <string name="health_connect_unavailable">Health Connect is not available on this device</string>
+    <string name="health_connect_install">Install Health Connect</string>
+    <string name="health_connect_permissions">Grant permissions to share health data between Petal and Health Connect</string>
+    <string name="grant_permissions">Grant Permissions</string>
+    <string name="manage_health_connect">Manage Health Connect</string>
+
+    <!-- Wear OS -->
+    <string name="wear_os">Wear OS</string>
+    <string name="wear_connected">Watch connected</string>
+    <string name="wear_not_connected">No watch connected</string>
+    <string name="wear_sync">Sync to watch</string>
+    <string name="wear_last_sync">Last synced: %s</string>
+    <string name="wear_haptic_settings">Haptic Settings</string>
+    <string name="wear_phase_change_haptic">Phase change vibration</string>
+    <string name="wear_period_reminder_haptic">Period reminder vibration</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Shows your current cycle day, phase, and daily tips at a glance</string>
+    <string name="widget_name">Petal Cycle</string>
+
+    <!-- Confidence -->
+    <string name="confidence_low">Low confidence</string>
+    <string name="confidence_moderate">Moderate confidence</string>
+    <string name="confidence_high">High confidence</string>
+    <string name="confidence_explanation_low">Log more cycles to improve prediction accuracy</string>
+    <string name="confidence_explanation_moderate">Predictions are getting more reliable</string>
+    <string name="confidence_explanation_high">Predictions are highly accurate based on your data</string>
+
+    <!-- Flow -->
+    <string name="flow_light">Light</string>
+    <string name="flow_medium">Medium</string>
+    <string name="flow_heavy">Heavy</string>
+
+    <!-- Symptoms -->
+    <string name="symptom_none">None</string>
+    <string name="symptom_mild">Mild</string>
+    <string name="symptom_moderate">Moderate</string>
+    <string name="symptom_severe">Severe</string>
+
+    <!-- Moods -->
+    <string name="mood_calm">Calm</string>
+    <string name="mood_sensitive">Sensitive</string>
+    <string name="mood_low">Low</string>
+    <string name="mood_irritable">Irritable</string>
+    <string name="mood_swings">Mood swings</string>
+
+    <!-- Accessibility -->
+    <string name="a11y_cycle_ring">Cycle ring showing day %1$d of %2$d, %3$s phase, %4$d percent through cycle</string>
+    <string name="a11y_phase_card">%s phase card</string>
+    <string name="a11y_prediction_card">Predictions: next period %1$s, ovulation %2$s</string>
+    <string name="a11y_pattern_flag">%1$s pattern: %2$s</string>
+    <string name="a11y_energy_level">Energy level %1$d of 3</string>
+    <string name="a11y_back">Navigate back</string>
+    <string name="a11y_close">Close</string>
+    <string name="a11y_expand">Expand</string>
+    <string name="a11y_collapse">Collapse</string>
+    <string name="a11y_selected">Selected</string>
+    <string name="a11y_not_selected">Not selected</string>
+    <string name="a11y_loading">Loading</string>
+    <string name="a11y_chart">Chart</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="done">Done</string>
+    <string name="next">Next</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading\u2026</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">No internet connection. Data will sync when you are back online.</string>
+    <string name="no_data">No data yet</string>
+    <string name="days_format">%d days</string>
+    <string name="just_now">Just now</string>
+    <string name="minutes_ago">%dm ago</string>
+    <string name="hours_ago">%dh ago</string>
+    <string name="days_ago">%dd ago</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Health Connect permissions declared for the permission rationale activity -->
+    <string-array name="health_permissions">
+        <item>androidx.health.permission.MenstruationPeriod.READ</item>
+        <item>androidx.health.permission.MenstruationPeriod.WRITE</item>
+        <item>androidx.health.permission.BasalBodyTemperature.READ</item>
+        <item>androidx.health.permission.SleepSession.READ</item>
+    </string-array>
+</resources>

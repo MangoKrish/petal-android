@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Petal</string>
+    <string name="app_tagline">El primer rastreador menstrual creado para parejas y cuidadores</string>
+
+    <!-- Auth -->
+    <string name="login_title">Bienvenida de vuelta</string>
+    <string name="signup_title">Crear cuenta</string>
+    <string name="email_label">Correo electr\u00f3nico</string>
+    <string name="password_label">Contrase\u00f1a</string>
+    <string name="name_label">Nombre</string>
+    <string name="sign_in">Iniciar sesi\u00f3n</string>
+    <string name="sign_up">Registrarse</string>
+    <string name="forgot_password">\u00bfOlvidaste tu contrase\u00f1a?</string>
+    <string name="forgot_password_title">Restablecer contrase\u00f1a</string>
+    <string name="forgot_password_body">Ingresa tu correo electr\u00f3nico y te enviaremos un enlace para restablecer tu contrase\u00f1a.</string>
+    <string name="send_reset_link">Enviar enlace</string>
+    <string name="back_to_login">Volver a iniciar sesi\u00f3n</string>
+    <string name="sign_out">Cerrar sesi\u00f3n</string>
+    <string name="or_continue_with">o continuar con</string>
+    <string name="already_have_account">\u00bfYa tienes una cuenta?</string>
+    <string name="dont_have_account">\u00bfNo tienes una cuenta?</string>
+    <string name="password_requirement">Al menos 8 caracteres</string>
+    <string name="terms_agreement">Al continuar, aceptas nuestros T\u00e9rminos de Servicio y Pol\u00edtica de Privacidad</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Panel principal</string>
+    <string name="cycle_day">D\u00eda %d</string>
+    <string name="days_until_period">%d d\u00edas hasta el per\u00edodo</string>
+    <string name="period_expected">Per\u00edodo esperado</string>
+    <string name="period_expected_tomorrow">Per\u00edodo esperado ma\u00f1ana</string>
+    <string name="predictions">Predicciones</string>
+    <string name="next_period">Pr\u00f3ximo per\u00edodo</string>
+    <string name="ovulation">Ovulaci\u00f3n</string>
+    <string name="fertile_window">Ventana f\u00e9rtil</string>
+    <string name="quick_actions">Acciones r\u00e1pidas</string>
+    <string name="todays_tip">Consejo del d\u00eda</string>
+    <string name="pattern_insights">Patrones detectados</string>
+    <string name="greeting_hello">Hola, %s</string>
+
+    <!-- Phases -->
+    <string name="phase_menstrual">Menstrual</string>
+    <string name="phase_follicular">Folicular</string>
+    <string name="phase_ovulation">Ovulaci\u00f3n</string>
+    <string name="phase_luteal">L\u00fatea</string>
+    <string name="phase_format">Fase %s</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">Calendario</string>
+    <string name="period">Per\u00edodo</string>
+    <string name="predicted">Predicho</string>
+    <string name="fertile">F\u00e9rtil</string>
+    <string name="today">Hoy</string>
+    <string name="yesterday">Ayer</string>
+
+    <!-- Logging -->
+    <string name="log_period">Registrar per\u00edodo</string>
+    <string name="edit_entry">Editar entrada</string>
+    <string name="save_entry">Guardar entrada</string>
+    <string name="delete_entry">Eliminar entrada</string>
+    <string name="flow_intensity">Intensidad del flujo</string>
+    <string name="symptoms">S\u00edntomas</string>
+    <string name="cycle_length">Duraci\u00f3n del ciclo</string>
+    <string name="start_date">Fecha de inicio</string>
+    <string name="end_date">Fecha de fin</string>
+    <string name="pain">Dolor</string>
+    <string name="cramps">C\u00f3licos</string>
+    <string name="cravings">Antojos</string>
+    <string name="headaches">Dolores de cabeza</string>
+    <string name="mood">Estado de \u00e1nimo</string>
+    <string name="notes">Notas</string>
+    <string name="entry_saved">Entrada guardada exitosamente</string>
+    <string name="entry_deleted">Entrada eliminada</string>
+
+    <!-- Partner -->
+    <string name="partner_dashboard">Panel de pareja</string>
+    <string name="invite_partner">Invitar a tu pareja</string>
+    <string name="caregiver_guide">Gu\u00eda para cuidadores</string>
+    <string name="support_tips">C\u00f3mo apoyar a %s hoy</string>
+    <string name="partner_setup_title">Configurar uso compartido con pareja</string>
+    <string name="partner_setup_body">Comparte consejos de apoyo con tu pareja para que pueda entender y ayudar durante cada fase de tu ciclo.</string>
+    <string name="partner_code_label">C\u00f3digo de invitaci\u00f3n</string>
+    <string name="generate_invite">Generar enlace de invitaci\u00f3n</string>
+    <string name="copy_link">Copiar enlace</string>
+    <string name="partner_notifications">Notificaciones para pareja</string>
+    <string name="notification_timeline">Cronolog\u00eda</string>
+    <string name="partner_preview">Vista previa</string>
+    <string name="notification_controls">Controles</string>
+    <string name="what_partner_sees">Lo que ve tu pareja</string>
+    <string name="privacy_note">Nota de privacidad</string>
+    <string name="privacy_note_body">Tu pareja nunca ve datos crudos del ciclo como fechas o detalles del flujo. Solo reciben consejos y gu\u00edas de apoyo seleccionados. T\u00fa controlas exactamente lo que se comparte.</string>
+    <string name="notification_types">Tipos de notificaciones</string>
+    <string name="phase_change_alerts">Alertas de cambio de fase</string>
+    <string name="phase_change_alerts_desc">Cuando entras en una nueva fase del ciclo</string>
+    <string name="period_reminders">Per\u00edodo pr\u00f3ximo</string>
+    <string name="period_reminders_desc">Aviso cuando el per\u00edodo se acerca</string>
+    <string name="daily_support_tips">Consejos diarios de apoyo</string>
+    <string name="daily_support_tips_desc">Consejos adaptados a la fase</string>
+    <string name="mood_updates">Actualizaciones de \u00e1nimo</string>
+    <string name="mood_updates_desc">Compartir cambios de humor (requiere consentimiento expl\u00edcito)</string>
+    <string name="caregiver_guides">Gu\u00edas para cuidadores</string>
+    <string name="caregiver_guides_desc">Gu\u00eda semanal de cuidado para tu pareja</string>
+    <string name="phase_sharing">Fases compartidas</string>
+    <string name="phase_sharing_desc">Elige qu\u00e9 fases activan notificaciones para la pareja</string>
+    <string name="quiet_hours">Horas de silencio</string>
+    <string name="enable_quiet_hours">Activar horas de silencio</string>
+
+    <!-- Insights -->
+    <string name="daily_insights">Informaci\u00f3n diaria</string>
+    <string name="recommendations">Recomendaciones</string>
+    <string name="trends_charts">Tendencias y gr\u00e1ficos</string>
+    <string name="cycle_trends">Tendencias del ciclo</string>
+    <string name="cycle_length_over_time">Duraci\u00f3n del ciclo a lo largo del tiempo</string>
+    <string name="symptom_frequency">Frecuencia de s\u00edntomas por fase</string>
+    <string name="prediction_accuracy">Precisi\u00f3n de predicciones</string>
+    <string name="monthly_summary">Resumen mensual</string>
+    <string name="trend_analysis">An\u00e1lisis de tendencias</string>
+    <string name="symptom_insights">An\u00e1lisis de s\u00edntomas</string>
+    <string name="about_accuracy">Sobre la precisi\u00f3n</string>
+    <string name="export_data">Exportar datos</string>
+    <string name="average">Promedio</string>
+    <string name="shortest">M\u00e1s corto</string>
+    <string name="longest">M\u00e1s largo</string>
+    <string name="spread">Variaci\u00f3n</string>
+    <string name="avg_offset">Desfase promedio</string>
+    <string name="within_1_day">Dentro de 1 d\u00eda</string>
+    <string name="within_3_days">Dentro de 3 d\u00edas</string>
+
+    <!-- Weekly Overview -->
+    <string name="this_week">Esta semana</string>
+    <string name="previous_day">D\u00eda anterior</string>
+    <string name="next_day">D\u00eda siguiente</string>
+    <string name="energy">Energ\u00eda</string>
+    <string name="energy_low">Energ\u00eda baja</string>
+    <string name="energy_moderate">Energ\u00eda moderada</string>
+    <string name="energy_high">Energ\u00eda alta</string>
+
+    <!-- Education -->
+    <string name="education">Educaci\u00f3n</string>
+    <string name="health_qa">Preguntas y respuestas de salud</string>
+    <string name="read_more">Leer m\u00e1s</string>
+    <string name="related_articles">Art\u00edculos relacionados</string>
+
+    <!-- Settings -->
+    <string name="settings">Configuraci\u00f3n</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="privacy">Privacidad</string>
+    <string name="sharing">Compartir</string>
+    <string name="dark_mode">Modo oscuro</string>
+    <string name="discreet_mode">Modo discreto</string>
+    <string name="discreet_mode_desc">Ocultar contenido sensible en notificaciones y vista de aplicaciones</string>
+    <string name="delete_account">Eliminar cuenta</string>
+    <string name="data_export">Datos y privacidad</string>
+    <string name="about">Acerca de Petal</string>
+    <string name="version">Versi\u00f3n %s</string>
+    <string name="high_contrast_mode">Modo de alto contraste</string>
+    <string name="high_contrast_desc">Aumentar el contraste de colores para mejor visibilidad</string>
+
+    <!-- Data Export/Import -->
+    <string name="export_your_data">Exportar tus datos</string>
+    <string name="export_description">Descarga todos tus datos del ciclo en formatos portables</string>
+    <string name="export_csv">Exportar CSV</string>
+    <string name="export_csv_desc">Compatible con hojas de c\u00e1lculo. Funciona con Excel, Google Sheets y la mayor\u00eda de herramientas de an\u00e1lisis.</string>
+    <string name="export_json">Exportar JSON</string>
+    <string name="export_json_desc">Legible por m\u00e1quinas. Ideal para desarrolladores o transferir a otras aplicaciones.</string>
+    <string name="import_data">Importar datos</string>
+    <string name="import_description">Importar datos de otras aplicaciones o Health Connect</string>
+    <string name="import_health_connect">Health Connect</string>
+    <string name="import_health_connect_desc">Importar datos de menstruaci\u00f3n desde Android Health Connect</string>
+    <string name="import_csv_json">Importar desde CSV/JSON</string>
+    <string name="import_csv_json_desc">Importar desde Flo, Clue o cualquier archivo est\u00e1ndar de datos del ciclo</string>
+    <string name="import_success">Se importaron exitosamente %d registros del ciclo</string>
+    <string name="import_error">Error al importar datos: %s</string>
+    <string name="smart_detection">Detecci\u00f3n inteligente</string>
+    <string name="smart_detection_desc">Petal detecta autom\u00e1ticamente formatos de fecha, dise\u00f1os de columnas y estructuras de datos. Solo selecciona tu archivo y nosotros nos encargamos del resto.</string>
+
+    <!-- GDPR -->
+    <string name="gdpr_privacy">Privacidad y RGPD</string>
+    <string name="gdpr_full_export">Solicitar exportaci\u00f3n completa de datos</string>
+    <string name="gdpr_full_export_desc">Te enviaremos por correo una copia completa de todos los datos que Petal almacena sobre ti en un plazo de 30 d\u00edas</string>
+    <string name="gdpr_correction">Solicitar correcci\u00f3n de datos</string>
+    <string name="gdpr_correction_desc">Si alg\u00fan dato almacenado es incorrecto, solicita una correcci\u00f3n</string>
+    <string name="gdpr_deletion">Solicitar eliminaci\u00f3n de datos</string>
+    <string name="gdpr_deletion_desc">Eliminar permanentemente todos los datos asociados con tu cuenta</string>
+    <string name="gdpr_processing">Informaci\u00f3n de procesamiento de datos</string>
+    <string name="gdpr_processing_desc">Ver detalles sobre c\u00f3mo Petal procesa tus datos de salud</string>
+    <string name="data_storage">Almacenamiento de datos</string>
+    <string name="data_storage_desc">Tus datos del ciclo se almacenan localmente en tu dispositivo con cifrado. Al sincronizar, los datos se cifran en tr\u00e1nsito y en reposo. Petal nunca vende ni comparte tus datos de salud con terceros.</string>
+
+    <!-- Onboarding / Import -->
+    <string name="import_title">Importar tus datos</string>
+    <string name="import_heading">Trae tu historial del ciclo</string>
+    <string name="import_body">Importa datos existentes para que Petal pueda comenzar con predicciones precisas. Tus datos permanecen privados y seguros.</string>
+    <string name="preview_import">Vista previa de la importaci\u00f3n</string>
+    <string name="records_found">%d registros encontrados</string>
+    <string name="review_before_import">Revisa una muestra de los registros detectados antes de importar</string>
+    <string name="import_records">Importar %d registros</string>
+    <string name="choose_different_file">Elegir otro archivo</string>
+    <string name="importing_records">Importando registros\u2026</string>
+    <string name="import_complete">Importaci\u00f3n completa</string>
+    <string name="import_complete_body">Se importaron %d registros del ciclo exitosamente. Petal usar\u00e1 estos datos para generar predicciones m\u00e1s precisas de inmediato.</string>
+    <string name="continue_to_petal">Continuar a Petal</string>
+    <string name="skip">Omitir</string>
+
+    <!-- Health Connect -->
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_desc">Sincronizar datos del ciclo, temperatura y sue\u00f1o con Android Health Connect</string>
+    <string name="health_connect_unavailable">Health Connect no est\u00e1 disponible en este dispositivo</string>
+    <string name="health_connect_install">Instalar Health Connect</string>
+    <string name="health_connect_permissions">Otorgar permisos para compartir datos de salud entre Petal y Health Connect</string>
+    <string name="grant_permissions">Otorgar permisos</string>
+    <string name="manage_health_connect">Administrar Health Connect</string>
+
+    <!-- Wear OS -->
+    <string name="wear_os">Wear OS</string>
+    <string name="wear_connected">Reloj conectado</string>
+    <string name="wear_not_connected">Ning\u00fan reloj conectado</string>
+    <string name="wear_sync">Sincronizar con reloj</string>
+    <string name="wear_last_sync">\u00daltima sincronizaci\u00f3n: %s</string>
+    <string name="wear_haptic_settings">Configuraci\u00f3n h\u00e1ptica</string>
+    <string name="wear_phase_change_haptic">Vibraci\u00f3n de cambio de fase</string>
+    <string name="wear_period_reminder_haptic">Vibraci\u00f3n de recordatorio de per\u00edodo</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Muestra tu d\u00eda del ciclo actual, fase y consejos diarios de un vistazo</string>
+    <string name="widget_name">Ciclo Petal</string>
+
+    <!-- Confidence -->
+    <string name="confidence_low">Confianza baja</string>
+    <string name="confidence_moderate">Confianza moderada</string>
+    <string name="confidence_high">Confianza alta</string>
+    <string name="confidence_explanation_low">Registra m\u00e1s ciclos para mejorar la precisi\u00f3n de las predicciones</string>
+    <string name="confidence_explanation_moderate">Las predicciones son cada vez m\u00e1s fiables</string>
+    <string name="confidence_explanation_high">Las predicciones son muy precisas basadas en tus datos</string>
+
+    <!-- Flow -->
+    <string name="flow_light">Ligero</string>
+    <string name="flow_medium">Medio</string>
+    <string name="flow_heavy">Abundante</string>
+
+    <!-- Symptoms -->
+    <string name="symptom_none">Ninguno</string>
+    <string name="symptom_mild">Leve</string>
+    <string name="symptom_moderate">Moderado</string>
+    <string name="symptom_severe">Severo</string>
+
+    <!-- Moods -->
+    <string name="mood_calm">Tranquila</string>
+    <string name="mood_sensitive">Sensible</string>
+    <string name="mood_low">Decaída</string>
+    <string name="mood_irritable">Irritable</string>
+    <string name="mood_swings">Cambios de humor</string>
+
+    <!-- Accessibility -->
+    <string name="a11y_cycle_ring">Anillo del ciclo mostrando d\u00eda %1$d de %2$d, fase %3$s, %4$d por ciento del ciclo completado</string>
+    <string name="a11y_phase_card">Tarjeta de fase %s</string>
+    <string name="a11y_prediction_card">Predicciones: pr\u00f3ximo per\u00edodo %1$s, ovulaci\u00f3n %2$s</string>
+    <string name="a11y_pattern_flag">Patr\u00f3n %1$s: %2$s</string>
+    <string name="a11y_energy_level">Nivel de energ\u00eda %1$d de 3</string>
+    <string name="a11y_back">Volver</string>
+    <string name="a11y_close">Cerrar</string>
+    <string name="a11y_expand">Expandir</string>
+    <string name="a11y_collapse">Contraer</string>
+    <string name="a11y_selected">Seleccionado</string>
+    <string name="a11y_not_selected">No seleccionado</string>
+    <string name="a11y_loading">Cargando</string>
+    <string name="a11y_chart">Gr\u00e1fico</string>
+
+    <!-- Common -->
+    <string name="ok">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Guardar</string>
+    <string name="delete">Eliminar</string>
+    <string name="edit">Editar</string>
+    <string name="done">Listo</string>
+    <string name="next">Siguiente</string>
+    <string name="back">Volver</string>
+    <string name="close">Cerrar</string>
+    <string name="retry">Reintentar</string>
+    <string name="loading">Cargando\u2026</string>
+    <string name="error_generic">Algo sali\u00f3 mal. Por favor, int\u00e9ntalo de nuevo.</string>
+    <string name="error_network">Sin conexi\u00f3n a internet. Los datos se sincronizar\u00e1n cuando vuelvas a estar en l\u00ednea.</string>
+    <string name="no_data">Sin datos a\u00fan</string>
+    <string name="days_format">%d d\u00edas</string>
+    <string name="just_now">Ahora mismo</string>
+    <string name="minutes_ago">hace %dm</string>
+    <string name="hours_ago">hace %dh</string>
+    <string name="days_ago">hace %dd</string>
+</resources>
