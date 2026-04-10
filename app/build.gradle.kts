@@ -145,6 +145,10 @@ dependencies {
     // Health Connect
     implementation(libs.health.connect)
 
+    // Window size classes for adaptive layouts
+    implementation(libs.window)
+    implementation(libs.compose.material3.window.size)
+
     // AndroidX
     implementation(libs.core.ktx)
     implementation(libs.activity.compose)

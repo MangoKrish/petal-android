@@ -1,11 +1,16 @@
 package com.petal.app.navigation
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -58,6 +63,10 @@ fun PetalNavGraph(
     val currentEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentEntry?.destination?.route
 
+    // Adaptive layout: use NavigationRail on wide screens (tablets)
+    val configuration = LocalConfiguration.current
+    val useRail = configuration.screenWidthDp >= 600
+
     val showBottomNav = currentRoute in listOf(
         Screen.Dashboard.route,
         Screen.Calendar.route,
@@ -67,30 +76,35 @@ fun PetalNavGraph(
         Screen.Settings.route
     )
 
-    Scaffold(
-        bottomBar = {
-            if (showBottomNav) {
-                BottomNavBar(
-                    currentRoute = currentRoute ?: "",
-                    onNavigate = { route ->
-                        navController.navigate(route) {
-                            popUpTo(Screen.Dashboard.route) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                )
-            }
-        }
-    ) { innerPadding ->
+    val navContent: @Composable (Modifier) -> Unit = { modifier ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding),
-            enterTransition = { fadeIn(animationSpec = tween(300)) + slideInHorizontally(initialOffsetX = { 100 }) },
-            exitTransition = { fadeOut(animationSpec = tween(300)) },
-            popEnterTransition = { fadeIn(animationSpec = tween(300)) + slideInHorizontally(initialOffsetX = { -100 }) },
-            popExitTransition = { fadeOut(animationSpec = tween(300)) + slideOutHorizontally(targetOffsetX = { 100 }) }
+            modifier = modifier,
+            enterTransition = {
+                fadeIn(animationSpec = tween(280)) +
+                    slideInHorizontally(
+                        initialOffsetX = { 80 },
+                        animationSpec = tween(280)
+                    )
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(200))
+            },
+            popEnterTransition = {
+                fadeIn(animationSpec = tween(280)) +
+                    slideInHorizontally(
+                        initialOffsetX = { -80 },
+                        animationSpec = tween(280)
+                    )
+            },
+            popExitTransition = {
+                fadeOut(animationSpec = tween(200)) +
+                    slideOutHorizontally(
+                        targetOffsetX = { 80 },
+                        animationSpec = tween(200)
+                    )
+            }
         ) {
             // Auth
             composable(Screen.Login.route) {
@@ -291,6 +305,43 @@ fun PetalNavGraph(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
+        }
+    }
+
+    // Adaptive layout: Rail on tablets, bottom bar on phones
+    if (useRail && showBottomNav) {
+        Row {
+            BottomNavBar(
+                currentRoute = currentRoute ?: "",
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(Screen.Dashboard.route) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                useRail = true
+            )
+            navContent(Modifier.weight(1f))
+        }
+    } else {
+        Scaffold(
+            bottomBar = {
+                if (showBottomNav) {
+                    BottomNavBar(
+                        currentRoute = currentRoute ?: "",
+                        onNavigate = { route ->
+                            navController.navigate(route) {
+                                popUpTo(Screen.Dashboard.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
+            }
+        ) { innerPadding ->
+            navContent(Modifier.padding(innerPadding))
         }
     }
 }

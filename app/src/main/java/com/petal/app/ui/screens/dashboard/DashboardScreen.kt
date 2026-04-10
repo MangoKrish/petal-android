@@ -19,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.petal.app.data.model.FlagSeverity
 import com.petal.app.ui.components.PetalCard
 import com.petal.app.ui.components.PhaseGradientBackground
+import com.petal.app.ui.components.QuickLogBottomSheet
 import com.petal.app.ui.theme.*
 import com.petal.app.ui.viewmodel.DashboardViewModel
 
@@ -33,6 +34,7 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showQuickLogSheet by remember { mutableStateOf(false) }
 
     if (uiState.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -44,6 +46,22 @@ fun DashboardScreen(
     // Stagger animation state
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
+
+    // Bottom sheet for quick log
+    QuickLogBottomSheet(
+        isVisible = showQuickLogSheet,
+        currentDay = uiState.cycleDay,
+        phase = uiState.currentPhase.display,
+        onDismiss = { showQuickLogSheet = false },
+        onLogPeriod = { flow ->
+            // TODO: Wire to ViewModel
+            showQuickLogSheet = false
+        },
+        onLogMoodSymptoms = { moods, symptoms ->
+            // TODO: Wire to ViewModel
+            showQuickLogSheet = false
+        }
+    )
 
     PhaseGradientBackground(phase = uiState.currentPhase) {
         Column(
@@ -189,9 +207,9 @@ fun DashboardScreen(
                     ) {
                         QuickActionButton(
                             icon = Icons.Default.Add,
-                            label = "Log",
+                            label = "Quick Log",
                             color = Rose500,
-                            onClick = onNavigateToQuickLog,
+                            onClick = { showQuickLogSheet = true },
                             modifier = Modifier.weight(1f)
                         )
                         QuickActionButton(

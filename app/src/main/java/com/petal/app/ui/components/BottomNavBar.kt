@@ -1,7 +1,7 @@
 package com.petal.app.ui.components
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -57,6 +57,19 @@ private val navItems = listOf(
 @Composable
 fun BottomNavBar(
     currentRoute: String,
+    onNavigate: (String) -> Unit,
+    useRail: Boolean = false
+) {
+    if (useRail) {
+        AdaptiveNavigationRail(currentRoute = currentRoute, onNavigate = onNavigate)
+    } else {
+        BottomNavigationBar(currentRoute = currentRoute, onNavigate = onNavigate)
+    }
+}
+
+@Composable
+private fun BottomNavigationBar(
+    currentRoute: String,
     onNavigate: (String) -> Unit
 ) {
     NavigationBar(
@@ -67,9 +80,8 @@ fun BottomNavBar(
             val isSelected = currentRoute == item.route || (currentRoute.startsWith(item.route.split("?")[0]))
             val isLogButton = item.route == Screen.QuickLog.baseRoute
 
-            // Bounce animation on selection
             val iconScale by animateFloatAsState(
-                targetValue = if (isSelected) 1.1f else 1f,
+                targetValue = if (isSelected) 1.15f else 1f,
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessMedium
@@ -111,5 +123,58 @@ fun BottomNavBar(
                 )
             )
         }
+    }
+}
+
+@Composable
+private fun AdaptiveNavigationRail(
+    currentRoute: String,
+    onNavigate: (String) -> Unit
+) {
+    NavigationRail(
+        containerColor = MaterialTheme.colorScheme.surface,
+        header = {
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+        navItems.forEach { item ->
+            val isSelected = currentRoute == item.route || (currentRoute.startsWith(item.route.split("?")[0]))
+
+            val iconScale by animateFloatAsState(
+                targetValue = if (isSelected) 1.1f else 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                ),
+                label = "rail_icon_scale_${item.route}"
+            )
+
+            NavigationRailItem(
+                selected = isSelected,
+                onClick = { onNavigate(item.route) },
+                icon = {
+                    Icon(
+                        imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                        contentDescription = item.label,
+                        modifier = Modifier.scale(iconScale)
+                    )
+                },
+                label = {
+                    Text(
+                        text = item.label,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                colors = NavigationRailItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }

@@ -2,6 +2,7 @@ package com.petal.app.ui.screens.dashboard
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,10 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,46 +53,67 @@ fun CycleRing(
     val progress = cycleDay.toFloat() / cycleLength.toFloat()
     val segments = remember(cycleLength) { getPhaseSegments(cycleLength) }
 
-    // Staggered arc draw animation
+    // Staggered arc draw animation with spring physics
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
-        animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
         label = "cycle_ring_progress"
     )
 
-    // Per-segment reveal animation
+    // Per-segment reveal animation with stagger
     val segmentReveals = segments.mapIndexed { index, _ ->
         val animatable = remember { Animatable(0f) }
         LaunchedEffect(Unit) {
             animatable.animateTo(
                 targetValue = 1f,
-                animationSpec = tween(
-                    durationMillis = 800,
-                    delayMillis = index * 150,
-                    easing = FastOutSlowInEasing
-                )
+                animationSpec = spring(
+                    dampingRatio = 0.65f,
+                    stiffness = 200f,
+                    visibilityThreshold = 0.001f
+                ).let { spec ->
+                    tween<Float>(
+                        durationMillis = 900,
+                        delayMillis = index * 120,
+                        easing = FastOutSlowInEasing
+                    )
+                }
             )
         }
         animatable.value
     }
 
-    // Marker scale animation
+    // Marker entrance with spring
     val markerScale by animateFloatAsState(
         targetValue = 1f,
-        animationSpec = spring(dampingRatio = 0.5f, stiffness = 300f),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
         label = "marker_scale"
     )
 
-    // Pulsing glow for current phase
+    // Double-layer pulsing glow
     val infiniteTransition = rememberInfiniteTransition(label = "glow")
     val glowAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.6f,
+        initialValue = 0.2f,
+        targetValue = 0.55f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = EaseInOut),
+            animation = tween(2500, easing = EaseInOut),
             repeatMode = RepeatMode.Reverse
         ),
         label = "glow_alpha"
+    )
+    val outerGlowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.05f,
+        targetValue = 0.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = EaseInOut),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "outer_glow_alpha"
     )
 
     // Animated day counter
@@ -100,6 +123,17 @@ fun CycleRing(
         label = "day_counter"
     )
 
+    // Tap interaction for press feedback
+    var isPressed by remember { mutableStateOf(false) }
+    val pressScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
+        label = "press_scale"
+    )
+
     val phaseColor = when (phase) {
         CyclePhase.Menstrual -> Rose500
         CyclePhase.Follicular -> Teal500
@@ -107,39 +141,83 @@ fun CycleRing(
         CyclePhase.Luteal -> Lavender500
     }
 
+    val phaseColorLight = when (phase) {
+        CyclePhase.Menstrual -> Rose100
+        CyclePhase.Follicular -> Teal100
+        CyclePhase.Ovulation -> Gold100
+        CyclePhase.Luteal -> Lavender100
+    }
+
+    val trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+
     Box(
-        modifier = modifier.size(240.dp),
+        modifier = modifier
+            .size(260.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isPressed = true
+                        tryAwaitRelease()
+                        isPressed = false
+                    }
+                )
+            },
         contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
             val strokeWidth = 14.dp.toPx()
-            val glowStrokeWidth = 22.dp.toPx()
-            val arcSize = Size(size.width - glowStrokeWidth, size.height - glowStrokeWidth)
-            val topLeft = Offset(glowStrokeWidth / 2, glowStrokeWidth / 2)
-            val gapDeg = 2f // gap between segments
+            val glowStrokeWidth = 24.dp.toPx()
+            val outerGlowWidth = 36.dp.toPx()
+            val arcSize = Size(size.width - outerGlowWidth, size.height - outerGlowWidth)
+            val topLeft = Offset(outerGlowWidth / 2, outerGlowWidth / 2)
+            val gapDeg = 2.5f
 
-            // Draw background track
+            // Outer ambient glow for active phase
             drawArc(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                color = phaseColor.copy(alpha = outerGlowAlpha * 0.15f),
                 startAngle = -90f,
                 sweepAngle = 360f,
                 useCenter = false,
                 topLeft = topLeft,
                 size = arcSize,
-                style = Stroke(width = strokeWidth * 0.6f, cap = StrokeCap.Round)
+                style = Stroke(width = outerGlowWidth, cap = StrokeCap.Round)
             )
 
-            // Draw each phase segment
+            // Draw background track
+            drawArc(
+                color = trackColor,
+                startAngle = -90f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = topLeft,
+                size = arcSize,
+                style = Stroke(width = strokeWidth * 0.5f, cap = StrokeCap.Round)
+            )
+
+            // Draw each phase segment with enhanced glow
             segments.forEachIndexed { index, segment ->
                 val startAngle = -90f + segment.startFraction * 360f + gapDeg / 2
                 val sweepAngle = (segment.endFraction - segment.startFraction) * 360f - gapDeg
                 val reveal = segmentReveals.getOrElse(index) { 1f }
                 val isActive = segment.phase == phase
 
-                // Glow for active segment
+                // Double-layer glow for active segment
                 if (isActive) {
                     drawArc(
-                        color = segment.color.copy(alpha = glowAlpha * 0.3f),
+                        color = segment.color.copy(alpha = glowAlpha * 0.2f),
+                        startAngle = startAngle,
+                        sweepAngle = sweepAngle * reveal,
+                        useCenter = false,
+                        topLeft = topLeft,
+                        size = arcSize,
+                        style = Stroke(width = outerGlowWidth, cap = StrokeCap.Round)
+                    )
+                    drawArc(
+                        color = segment.color.copy(alpha = glowAlpha * 0.4f),
                         startAngle = startAngle,
                         sweepAngle = sweepAngle * reveal,
                         useCenter = false,
@@ -151,41 +229,51 @@ fun CycleRing(
 
                 // Main arc
                 drawArc(
-                    color = segment.color.copy(alpha = if (isActive) 1f else 0.3f),
+                    color = segment.color.copy(alpha = if (isActive) 1f else 0.25f),
                     startAngle = startAngle,
                     sweepAngle = sweepAngle * reveal,
                     useCenter = false,
                     topLeft = topLeft,
                     size = arcSize,
-                    style = Stroke(width = if (isActive) strokeWidth else strokeWidth * 0.85f, cap = StrokeCap.Round)
+                    style = Stroke(
+                        width = if (isActive) strokeWidth * 1.1f else strokeWidth * 0.8f,
+                        cap = StrokeCap.Round
+                    )
                 )
             }
 
-            // Current position marker
+            // Current position marker with enhanced glow
             val angle = Math.toRadians((-90 + animatedProgress * 360).toDouble())
-            val ringRadius = (size.width - glowStrokeWidth) / 2
+            val ringRadius = (size.width - outerGlowWidth) / 2
             val centerX = size.width / 2
             val centerY = size.height / 2
             val dotX = centerX + ringRadius * Math.cos(angle).toFloat()
             val dotY = centerY + ringRadius * Math.sin(angle).toFloat()
 
-            // Pulsing glow behind marker
+            // Outer glow ring around marker
             drawCircle(
-                color = phaseColor.copy(alpha = glowAlpha * 0.4f),
-                radius = 16.dp.toPx() * markerScale,
+                color = phaseColor.copy(alpha = outerGlowAlpha * 0.5f),
+                radius = 20.dp.toPx() * markerScale,
                 center = Offset(dotX, dotY)
             )
 
-            // White border
+            // Inner glow behind marker
             drawCircle(
-                color = Color.White,
-                radius = 8.dp.toPx() * markerScale,
+                color = phaseColor.copy(alpha = glowAlpha * 0.5f),
+                radius = 14.dp.toPx() * markerScale,
                 center = Offset(dotX, dotY)
             )
-            // Colored dot
+
+            // White border marker
+            drawCircle(
+                color = Color.White,
+                radius = 9.dp.toPx() * markerScale,
+                center = Offset(dotX, dotY)
+            )
+            // Colored center dot
             drawCircle(
                 color = phaseColor,
-                radius = 6.dp.toPx() * markerScale,
+                radius = 7.dp.toPx() * markerScale,
                 center = Offset(dotX, dotY)
             )
         }
