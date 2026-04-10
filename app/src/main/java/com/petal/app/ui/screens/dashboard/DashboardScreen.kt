@@ -1,5 +1,7 @@
 package com.petal.app.ui.screens.dashboard
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,10 +36,14 @@ fun DashboardScreen(
 
     if (uiState.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = Rose500)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
         return
     }
+
+    // Stagger animation state
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
 
     PhaseGradientBackground(phase = uiState.currentPhase) {
         Column(
@@ -48,84 +55,112 @@ fun DashboardScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Greeting
-            Text(
-                text = uiState.insights?.greeting ?: "Hello, ${uiState.userName}",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold
-            )
+            // Greeting with fade
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(600)) + slideInVertically(tween(600)) { -20 }
+            ) {
+                Text(
+                    text = uiState.insights?.greeting ?: "Hello, ${uiState.userName}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Cycle Ring
-            CycleRing(
-                cycleDay = uiState.cycleDay,
-                cycleLength = uiState.cycleLengthAvg,
-                phase = uiState.currentPhase,
-                daysUntilPeriod = uiState.daysUntilNextPeriod
-            )
+            // Cycle Ring with scale-in
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(800, delayMillis = 200)) + scaleIn(
+                    tween(800, delayMillis = 200),
+                    initialScale = 0.8f
+                )
+            ) {
+                CycleRing(
+                    cycleDay = uiState.cycleDay,
+                    cycleLength = uiState.cycleLengthAvg,
+                    phase = uiState.currentPhase,
+                    daysUntilPeriod = uiState.daysUntilNextPeriod
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Phase Card
-            PhaseCard(
-                phase = uiState.currentPhase,
-                hormoneNote = uiState.insights?.hormoneNote ?: ""
-            )
+            // Phase Card with slide
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(500, delayMillis = 400)) + slideInVertically(tween(500, delayMillis = 400)) { 30 }
+            ) {
+                PhaseCard(
+                    phase = uiState.currentPhase,
+                    hormoneNote = uiState.insights?.hormoneNote ?: ""
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Prediction Card
-            PredictionCard(
-                nextPeriodDate = uiState.nextPeriodDate,
-                ovulationDate = uiState.ovulationDate,
-                fertileWindowStart = uiState.fertileWindowStart,
-                fertileWindowEnd = uiState.fertileWindowEnd,
-                confidence = uiState.confidence
-            )
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(500, delayMillis = 500)) + slideInVertically(tween(500, delayMillis = 500)) { 30 }
+            ) {
+                PredictionCard(
+                    nextPeriodDate = uiState.nextPeriodDate,
+                    ovulationDate = uiState.ovulationDate,
+                    fertileWindowStart = uiState.fertileWindowStart,
+                    fertileWindowEnd = uiState.fertileWindowEnd,
+                    confidence = uiState.confidence
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Pattern Flags
             if (uiState.patternFlags.isNotEmpty()) {
-                PetalCard {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Text(
-                            "Pattern Insights",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        uiState.patternFlags.forEach { flag ->
-                            val flagColor = when (flag.severity) {
-                                FlagSeverity.Info -> Teal500
-                                FlagSeverity.Watch -> Gold500
-                                FlagSeverity.Care -> Rose500
-                            }
-                            Row(
-                                modifier = Modifier.padding(vertical = 6.dp),
-                                verticalAlignment = Alignment.Top
-                            ) {
-                                Icon(
-                                    Icons.Default.FiberManualRecord,
-                                    contentDescription = null,
-                                    tint = flagColor,
-                                    modifier = Modifier
-                                        .size(10.dp)
-                                        .padding(top = 6.dp)
-                                )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
-                                    Text(
-                                        flag.title,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(500, delayMillis = 600)) + slideInVertically(tween(500, delayMillis = 600)) { 30 }
+                ) {
+                    PetalCard {
+                        Column(modifier = Modifier.padding(20.dp)) {
+                            Text(
+                                "Pattern Insights",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            uiState.patternFlags.forEach { flag ->
+                                val flagColor = when (flag.severity) {
+                                    FlagSeverity.Info -> Teal500
+                                    FlagSeverity.Watch -> Gold500
+                                    FlagSeverity.Care -> Rose500
+                                }
+                                Row(
+                                    modifier = Modifier.padding(vertical = 6.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Icon(
+                                        Icons.Default.FiberManualRecord,
+                                        contentDescription = null,
+                                        tint = flagColor,
+                                        modifier = Modifier
+                                            .size(10.dp)
+                                            .padding(top = 6.dp)
                                     )
-                                    Text(
-                                        flag.detail,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            flag.title,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Text(
+                                            flag.detail,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -135,71 +170,83 @@ fun DashboardScreen(
             }
 
             // Quick Actions
-            Text(
-                "Quick Actions",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(500, delayMillis = 700)) + slideInVertically(tween(500, delayMillis = 700)) { 30 }
             ) {
-                QuickActionButton(
-                    icon = Icons.Default.Add,
-                    label = "Log",
-                    color = Rose500,
-                    onClick = onNavigateToQuickLog,
-                    modifier = Modifier.weight(1f)
-                )
-                QuickActionButton(
-                    icon = Icons.Default.Lightbulb,
-                    label = "Insights",
-                    color = Teal500,
-                    onClick = onNavigateToInsights,
-                    modifier = Modifier.weight(1f)
-                )
-                QuickActionButton(
-                    icon = Icons.AutoMirrored.Filled.TrendingUp,
-                    label = "Trends",
-                    color = Gold500,
-                    onClick = onNavigateToCharts,
-                    modifier = Modifier.weight(1f)
-                )
-                QuickActionButton(
-                    icon = Icons.Default.School,
-                    label = "Learn",
-                    color = Lavender500,
-                    onClick = onNavigateToEducation,
-                    modifier = Modifier.weight(1f)
-                )
+                Column {
+                    Text(
+                        "Quick Actions",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        QuickActionButton(
+                            icon = Icons.Default.Add,
+                            label = "Log",
+                            color = Rose500,
+                            onClick = onNavigateToQuickLog,
+                            modifier = Modifier.weight(1f)
+                        )
+                        QuickActionButton(
+                            icon = Icons.Default.Lightbulb,
+                            label = "Insights",
+                            color = Teal500,
+                            onClick = onNavigateToInsights,
+                            modifier = Modifier.weight(1f)
+                        )
+                        QuickActionButton(
+                            icon = Icons.AutoMirrored.Filled.TrendingUp,
+                            label = "Trends",
+                            color = Gold500,
+                            onClick = onNavigateToCharts,
+                            modifier = Modifier.weight(1f)
+                        )
+                        QuickActionButton(
+                            icon = Icons.Default.School,
+                            label = "Learn",
+                            color = Lavender500,
+                            onClick = onNavigateToEducation,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Daily Insight Preview
             uiState.insights?.cards?.firstOrNull()?.let { card ->
-                PetalCard(onClick = onNavigateToInsights) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Text(
-                            "Today's Tip",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            card.headline,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            card.tip,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(500, delayMillis = 800)) + slideInVertically(tween(500, delayMillis = 800)) { 30 }
+                ) {
+                    PetalCard(onClick = onNavigateToInsights) {
+                        Column(modifier = Modifier.padding(20.dp)) {
+                            Text(
+                                "Today's Tip",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                card.headline,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                card.tip,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
@@ -217,11 +264,21 @@ private fun QuickActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var pressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 0.92f else 1f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = 500f),
+        label = "press_scale"
+    )
+
     ElevatedCard(
-        onClick = onClick,
-        modifier = modifier,
+        onClick = {
+            pressed = true
+            onClick()
+        },
+        modifier = modifier.scale(scale),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -241,6 +298,13 @@ private fun QuickActionButton(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+
+    LaunchedEffect(pressed) {
+        if (pressed) {
+            kotlinx.coroutines.delay(200)
+            pressed = false
         }
     }
 }

@@ -1,12 +1,15 @@
 package com.petal.app.ui.components
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.petal.app.navigation.Screen
@@ -58,11 +61,21 @@ fun BottomNavBar(
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 4.dp
+        tonalElevation = 2.dp
     ) {
         navItems.forEach { item ->
-            val isSelected = currentRoute == item.route || (currentRoute?.startsWith(item.route.split("?")[0]) == true)
+            val isSelected = currentRoute == item.route || (currentRoute.startsWith(item.route.split("?")[0]))
             val isLogButton = item.route == Screen.QuickLog.baseRoute
+
+            // Bounce animation on selection
+            val iconScale by animateFloatAsState(
+                targetValue = if (isSelected) 1.1f else 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                ),
+                label = "icon_scale_${item.route}"
+            )
 
             NavigationBarItem(
                 selected = isSelected,
@@ -72,13 +85,14 @@ fun BottomNavBar(
                         Icon(
                             imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
                             contentDescription = item.label,
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(32.dp).scale(iconScale),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     } else {
                         Icon(
                             imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                            contentDescription = item.label
+                            contentDescription = item.label,
+                            modifier = Modifier.scale(iconScale)
                         )
                     }
                 },

@@ -139,6 +139,9 @@ dependencies {
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
 
+    // Lottie
+    implementation(libs.lottie.compose)
+
     // Health Connect
     implementation(libs.health.connect)
 
