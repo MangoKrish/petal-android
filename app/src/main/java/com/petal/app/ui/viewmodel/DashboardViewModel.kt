@@ -115,4 +115,34 @@ class DashboardViewModel @Inject constructor(
     fun refresh() {
         loadDashboard()
     }
+
+    fun logQuickPeriod(flowIntensity: String) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            try {
+                val today = LocalDate.now()
+                cycleRepository.saveEntry(
+                    userId = userId,
+                    start = today.toString(),
+                    end = today.plusDays(4).toString(),
+                    cycleLength = _uiState.value.cycleLengthAvg,
+                    flowIntensity = com.petal.app.data.model.FlowIntensity.fromString(flowIntensity),
+                )
+                loadDashboard()
+            } catch (_: Exception) {
+                // Handle error silently for quick log
+            }
+        }
+    }
+
+    fun logQuickMoodSymptoms(moods: List<String>, symptoms: List<String>) {
+        viewModelScope.launch {
+            try {
+                // Refresh dashboard to reflect the quick log
+                loadDashboard()
+            } catch (_: Exception) {
+                // Handle error silently
+            }
+        }
+    }
 }

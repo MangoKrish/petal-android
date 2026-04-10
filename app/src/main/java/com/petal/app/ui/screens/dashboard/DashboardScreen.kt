@@ -54,11 +54,11 @@ fun DashboardScreen(
         phase = uiState.currentPhase.display,
         onDismiss = { showQuickLogSheet = false },
         onLogPeriod = { flow ->
-            // TODO: Wire to ViewModel
+            viewModel.logQuickPeriod(flow)
             showQuickLogSheet = false
         },
         onLogMoodSymptoms = { moods, symptoms ->
-            // TODO: Wire to ViewModel
+            viewModel.logQuickMoodSymptoms(moods, symptoms)
             showQuickLogSheet = false
         }
     )

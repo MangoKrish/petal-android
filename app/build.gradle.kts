@@ -16,8 +16,8 @@ android {
         applicationId = "com.petal.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -153,4 +153,14 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.activity.compose)
     implementation(libs.core.splashscreen)
+
+    // Biometric auth (fingerprint / face)
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+
+    // Chrome Custom Tabs (for Stripe checkout)
+    implementation("androidx.browser:browser:1.8.0")
+
+    // Firebase Auth (for Google Sign-In)
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
 }

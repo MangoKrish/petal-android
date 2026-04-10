@@ -44,6 +44,10 @@ import com.petal.app.ui.screens.settings.NotificationSettingsScreen
 import com.petal.app.ui.screens.settings.PrivacySettingsScreen
 import com.petal.app.ui.screens.settings.SettingsScreen
 import com.petal.app.ui.screens.settings.ShareSettingsScreen
+import com.petal.app.ui.screens.premium.PremiumScreen
+import com.petal.app.ui.screens.referral.ReferralScreen
+import com.petal.app.ui.screens.journal.JournalScreen
+import com.petal.app.ui.screens.achievements.AchievementsScreen
 import com.petal.app.ui.viewmodel.AuthViewModel
 
 @Composable
@@ -278,6 +282,10 @@ fun PetalNavGraph(
                     onNavigateToNotifications = { navController.navigate(Screen.NotificationSettings.route) },
                     onNavigateToPrivacy = { navController.navigate(Screen.PrivacySettings.route) },
                     onNavigateToSharing = { navController.navigate(Screen.ShareSettings.route) },
+                    onNavigateToPremium = { navController.navigate(Screen.Premium.route) },
+                    onNavigateToReferral = { navController.navigate(Screen.Referral.route) },
+                    onNavigateToJournal = { navController.navigate(Screen.Journal.route) },
+                    onNavigateToAchievements = { navController.navigate(Screen.Achievements.route) },
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
@@ -302,6 +310,34 @@ fun PetalNavGraph(
             }
             composable(Screen.DataExport.route) {
                 DataExportScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // Premium
+            composable(Screen.Premium.route) {
+                PremiumScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // Referral
+            composable(Screen.Referral.route) {
+                ReferralScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // Journal
+            composable(Screen.Journal.route) {
+                JournalScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // Achievements
+            composable(Screen.Achievements.route) {
+                AchievementsScreen(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

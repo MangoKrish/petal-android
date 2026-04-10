@@ -41,4 +41,10 @@ sealed class Screen(val route: String) {
     data object PrivacySettings : Screen("privacy_settings")
     data object ShareSettings : Screen("share_settings")
     data object DataExport : Screen("data_export")
+
+    // New screens
+    data object Premium : Screen("premium")
+    data object Referral : Screen("referral")
+    data object Journal : Screen("journal")
+    data object Achievements : Screen("achievements")
 }

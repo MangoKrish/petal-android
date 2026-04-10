@@ -22,6 +22,10 @@ fun SettingsScreen(
     onNavigateToNotifications: () -> Unit,
     onNavigateToPrivacy: () -> Unit,
     onNavigateToSharing: () -> Unit,
+    onNavigateToPremium: () -> Unit = {},
+    onNavigateToReferral: () -> Unit = {},
+    onNavigateToJournal: () -> Unit = {},
+    onNavigateToAchievements: () -> Unit = {},
     onLogout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
@@ -129,6 +133,45 @@ fun SettingsScreen(
                 title = "Privacy",
                 subtitle = "Data and privacy settings",
                 onClick = onNavigateToPrivacy
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Features
+            Text(
+                "Features",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SettingsNavItem(
+                icon = Icons.Default.Diamond,
+                title = "Petal Premium",
+                subtitle = "Unlock unlimited features",
+                onClick = onNavigateToPremium
+            )
+
+            SettingsNavItem(
+                icon = Icons.Default.CardGiftcard,
+                title = "Refer Friends",
+                subtitle = "Share Petal, earn achievements",
+                onClick = onNavigateToReferral
+            )
+
+            SettingsNavItem(
+                icon = Icons.Default.Book,
+                title = "Wellness Journal",
+                subtitle = "Your private reflection space",
+                onClick = onNavigateToJournal
+            )
+
+            SettingsNavItem(
+                icon = Icons.Default.EmojiEvents,
+                title = "Achievements",
+                subtitle = "Track your milestones",
+                onClick = onNavigateToAchievements
             )
 
             Spacer(modifier = Modifier.height(24.dp))
