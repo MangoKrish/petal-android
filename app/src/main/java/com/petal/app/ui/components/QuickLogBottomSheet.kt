@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.compose.*
+import com.petal.app.R
 import com.petal.app.ui.theme.*
 
 data class QuickLogData(
@@ -87,44 +89,61 @@ fun QuickLogBottomSheet(
         ) { currentMode ->
             when (currentMode) {
                 "done" -> {
-                    // Success state
+                    // Success state with Lottie celebration
+                    val composition by rememberLottieComposition(
+                        LottieCompositionSpec.RawRes(R.raw.celebration)
+                    )
+                    val lottieProgress by animateLottieCompositionAsState(
+                        composition = composition,
+                        iterations = 1,
+                        speed = 1.2f
+                    )
                     LaunchedEffect(Unit) {
-                        kotlinx.coroutines.delay(1500)
+                        kotlinx.coroutines.delay(2000)
                         mode = "idle"
                         onDismiss()
                     }
-                    Column(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        contentAlignment = Alignment.Center
                     ) {
-                        Surface(
-                            shape = MaterialTheme.shapes.extraLarge,
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            modifier = Modifier.size(72.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    Icons.Default.Check,
-                                    contentDescription = "Saved",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(36.dp)
-                                )
+                        // Lottie celebration behind
+                        LottieAnimation(
+                            composition = composition,
+                            progress = { lottieProgress },
+                            modifier = Modifier.size(200.dp)
+                        )
+                        // Text overlay
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Surface(
+                                shape = MaterialTheme.shapes.extraLarge,
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                modifier = Modifier.size(72.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        Icons.Default.Check,
+                                        contentDescription = "Saved",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(36.dp)
+                                    )
+                                }
                             }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                "Logged!",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                "Thanks for checking in today.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            "Logged!",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            "Thanks for checking in today.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
                     }
                 }
 

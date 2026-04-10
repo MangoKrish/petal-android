@@ -99,14 +99,6 @@ fun SettingsScreen(
                 onSelected = viewModel::updateThemeMode
             )
 
-            SettingsToggle(
-                icon = Icons.Default.VisibilityOff,
-                title = "Discreet mode",
-                subtitle = "Use neutral app name and icon",
-                checked = uiState.isDiscreetMode,
-                onCheckedChange = { viewModel.updateDiscreetMode(it) }
-            )
-
             Spacer(modifier = Modifier.height(24.dp))
 
             // Notifications & Sharing

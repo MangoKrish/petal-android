@@ -27,7 +27,6 @@ data class SettingsUiState(
     val notificationPrefs: NotificationPreferences = NotificationPreferences(),
     val shareLinks: List<SharedLink> = emptyList(),
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val isDiscreetMode: Boolean = false,
     val error: String? = null
 )
 
@@ -66,16 +65,13 @@ class SettingsViewModel @Inject constructor(
                     quietMode = prefs[PREF_QUIET_MODE] ?: false
                 )
                 val themeMode = ThemeMode.fromStorage(prefs[PREF_THEME_MODE])
-                val isDiscreet = prefs[PREF_DISCREET_MODE] ?: false
-
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         user = user,
                         notificationPrefs = notifPrefs,
                         shareLinks = links,
-                        themeMode = themeMode,
-                        isDiscreetMode = isDiscreet
+                        themeMode = themeMode
                     )
                 }
             }
@@ -112,13 +108,6 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             dataStore.edit { it[PREF_THEME_MODE] = themeMode.name }
             _uiState.update { it.copy(themeMode = themeMode) }
-        }
-    }
-
-    fun updateDiscreetMode(enabled: Boolean) {
-        viewModelScope.launch {
-            dataStore.edit { it[PREF_DISCREET_MODE] = enabled }
-            _uiState.update { it.copy(isDiscreetMode = enabled) }
         }
     }
 
@@ -171,6 +160,5 @@ class SettingsViewModel @Inject constructor(
         val PREF_IN_APP = booleanPreferencesKey("in_app_enabled")
         val PREF_QUIET_MODE = booleanPreferencesKey("quiet_mode")
         val PREF_THEME_MODE = stringPreferencesKey("theme_mode")
-        val PREF_DISCREET_MODE = booleanPreferencesKey("discreet_mode")
     }
 }

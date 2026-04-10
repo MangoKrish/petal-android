@@ -147,9 +147,7 @@
     <string name="privacy">Privacy</string>
     <string name="sharing">Sharing</string>
     <string name="dark_mode">Dark mode</string>
-    <string name="discreet_mode">Discreet mode</string>
-    <string name="discreet_mode_desc">Hide sensitive content in notifications and app switcher</string>
-    <string name="delete_account">Delete account</string>
+<string name="delete_account">Delete account</string>
     <string name="data_export">Data &amp; Privacy</string>
     <string name="about">About Petal</string>
     <string name="version">Version %s</string>
