@@ -22,7 +22,8 @@ import javax.inject.Singleton
 class AuthRepository @Inject constructor(
     private val userDao: UserDao,
     private val apiService: PetalApiService,
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val authInterceptor: AuthInterceptor
 ) {
     val isLoggedIn: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[AuthInterceptor.TOKEN_KEY] != null
@@ -68,6 +69,7 @@ class AuthRepository @Inject constructor(
                 createdAt = body.createdAt
             )
             userDao.insertUser(user)
+            authInterceptor.updateToken(body.token)
             dataStore.edit { prefs ->
                 prefs[AuthInterceptor.TOKEN_KEY] = body.token
                 prefs[AuthInterceptor.USER_ID_KEY] = body.userId
@@ -75,8 +77,15 @@ class AuthRepository @Inject constructor(
             }
             Result.success(user)
         } else {
-            Result.failure(Exception("Registration failed. Please try again."))
+            val errorBody = response.errorBody()?.string() ?: ""
+            val errorMsg = try {
+                val json = org.json.JSONObject(errorBody)
+                json.optJSONObject("error")?.optString("message") ?: json.optString("message", "Registration failed. Please try again.")
+            } catch (_: Exception) { "Registration failed (${response.code()}). Please try again." }
+            Result.failure(Exception(errorMsg))
         }
+    } catch (e: java.io.IOException) {
+        Result.failure(Exception("Network error. Check your connection and try again."))
     } catch (e: Exception) {
         Result.failure(e)
     }
@@ -94,6 +103,7 @@ class AuthRepository @Inject constructor(
                 createdAt = body.createdAt
             )
             userDao.insertUser(user)
+            authInterceptor.updateToken(body.token)
             dataStore.edit { prefs ->
                 prefs[AuthInterceptor.TOKEN_KEY] = body.token
                 prefs[AuthInterceptor.USER_ID_KEY] = body.userId
@@ -101,16 +111,24 @@ class AuthRepository @Inject constructor(
             }
             Result.success(user)
         } else {
-            Result.failure(Exception("Incorrect email or password."))
+            val errorBody = response.errorBody()?.string() ?: ""
+            val errorMsg = try {
+                val json = org.json.JSONObject(errorBody)
+                json.optJSONObject("error")?.optString("message") ?: json.optString("message", "Incorrect email or password.")
+            } catch (_: Exception) { "Login failed (${response.code()}). Please try again." }
+            Result.failure(Exception(errorMsg))
         }
+    } catch (e: java.io.IOException) {
+        Result.failure(Exception("Network error. Check your connection and try again."))
     } catch (e: Exception) {
         Result.failure(e)
     }
 
     suspend fun logout() {
+        authInterceptor.clearToken()
         try {
             apiService.logout()
-        } catch (_: Exception) { }
+        } catch (_: java.io.IOException) { /* offline – server session will expire */ }
         dataStore.edit { prefs ->
             prefs.remove(AuthInterceptor.TOKEN_KEY)
             prefs.remove(AuthInterceptor.USER_ID_KEY)

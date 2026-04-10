@@ -22,10 +22,54 @@ import kotlin.math.*
 @Singleton
 class BayesianPredictor @Inject constructor() {
 
-    // ---- Prior distribution (population-level) ----
-    // Based on published research: normal menstrual cycles average 28 days with std ~4
-    private val priorMean: Double = 28.0
-    private val priorVariance: Double = 16.0 // std=4, variance=16
+    companion object {
+        // ---- Prior distribution (population-level) ----
+        // Based on published research: normal menstrual cycles average 28 days with std ~4
+        const val PRIOR_MEAN = 28.0
+        const val PRIOR_STD = 4.0
+        const val PRIOR_VARIANCE = PRIOR_STD * PRIOR_STD // 16.0
+
+        // ---- Cycle length bounds ----
+        const val MIN_CYCLE_LENGTH = 18.0
+        const val MAX_CYCLE_LENGTH = 45.0
+
+        // ---- Ovulation & fertile window ----
+        const val LUTEAL_PHASE_DAYS = 14L
+        const val FERTILE_WINDOW_RADIUS = 3L
+
+        // ---- Symptom adjustment magnitudes ----
+        /** Severe cramps: high prostaglandins, sometimes shorter cycles. */
+        const val CRAMPS_ADJUSTMENT = -0.3
+        /** Mood disruption: hormonal fluctuations, sometimes extends luteal phase. */
+        const val MOOD_ADJUSTMENT = 0.2
+        /** Severe headaches near menstruation: estrogen withdrawal effect. */
+        const val HEADACHE_ADJUSTMENT = -0.15
+        /** Damping factor for cycle-length trend following. */
+        const val TREND_DAMPING_FACTOR = 0.3
+        /** Maximum total symptom adjustment (days). */
+        const val MAX_SYMPTOM_ADJUSTMENT = 1.5
+
+        // ---- Temperature trend detection ----
+        /** Fraction of readings used as baseline. */
+        const val TEMP_BASELINE_FRACTION = 0.6
+        /** Minimum temperature shift (degrees C) to indicate post-ovulation. */
+        const val TEMP_SHIFT_THRESHOLD = 0.2
+        /** Minimum readings above baseline to confirm sustained rise. */
+        const val TEMP_SUSTAINED_RISE_MIN = 3
+        const val TEMP_RISE_SENSITIVITY = 0.1
+
+        // ---- Confidence scoring ----
+        /** Observation factor saturation constant (saturates around 8-10 cycles). */
+        const val CONFIDENCE_OBS_SCALE = 4.0
+        /** Maximum posterior std before confidence drops to zero. */
+        const val CONFIDENCE_STD_CEILING = 5.0
+        /** Weight given to observation count vs precision in combined score. */
+        const val CONFIDENCE_OBS_WEIGHT = 0.4
+        const val CONFIDENCE_PRECISION_WEIGHT = 0.6
+    }
+
+    private val priorMean: Double = PRIOR_MEAN
+    private val priorVariance: Double = PRIOR_VARIANCE
 
     data class PredictionResult(
         val predictedLength: Double,
@@ -66,8 +110,8 @@ class BayesianPredictor @Inject constructor() {
 
         // 95% confidence interval
         val z95 = 1.96
-        val lowerBound = max(18.0, adjustedMean - z95 * posteriorStd)
-        val upperBound = min(45.0, adjustedMean + z95 * posteriorStd)
+        val lowerBound = max(MIN_CYCLE_LENGTH, adjustedMean - z95 * posteriorStd)
+        val upperBound = min(MAX_CYCLE_LENGTH, adjustedMean + z95 * posteriorStd)
 
         // Compute confidence score (0-1) based on posterior std and number of observations
         val confidence = computeConfidence(cycles.size, posteriorStd)
@@ -81,7 +125,7 @@ class BayesianPredictor @Inject constructor() {
 
         val predictedLengthRounded = adjustedMean.roundToInt()
         val nextPeriod = anchor.plusDays(predictedLengthRounded.toLong())
-        val ovulationDay = predictedLengthRounded - 14
+        val ovulationDay = predictedLengthRounded - LUTEAL_PHASE_DAYS.toInt()
         val nextOvulation = anchor.plusDays(ovulationDay.toLong())
 
         // If predicted dates are in the past, roll forward
@@ -94,7 +138,7 @@ class BayesianPredictor @Inject constructor() {
             rolled
         } else nextPeriod
 
-        val finalNextOvulation = finalNextPeriod.minusDays(14)
+        val finalNextOvulation = finalNextPeriod.minusDays(LUTEAL_PHASE_DAYS)
 
         return PredictionResult(
             predictedLength = adjustedMean,
@@ -102,8 +146,8 @@ class BayesianPredictor @Inject constructor() {
             confidence = confidence,
             nextPeriodDate = finalNextPeriod,
             nextOvulationDate = finalNextOvulation,
-            fertileWindowStart = finalNextOvulation.minusDays(3),
-            fertileWindowEnd = finalNextOvulation.plusDays(3),
+            fertileWindowStart = finalNextOvulation.minusDays(FERTILE_WINDOW_RADIUS),
+            fertileWindowEnd = finalNextOvulation.plusDays(FERTILE_WINDOW_RADIUS),
             posteriorMean = adjustedMean,
             posteriorStd = posteriorStd
         )
@@ -164,31 +208,31 @@ class BayesianPredictor @Inject constructor() {
         // Severe cramps tend to correlate with higher prostaglandin levels,
         // sometimes associated with slightly shorter cycles
         if (symptoms.cramps == SymptomLevel.Severe) {
-            adjustment -= 0.3
+            adjustment += CRAMPS_ADJUSTMENT
         }
 
         // Mood disruption (irritability, mood swings) can indicate
         // hormonal fluctuations that sometimes extend the luteal phase
         if (symptoms.mood == com.petal.app.data.model.MoodLevel.MoodSwings ||
             symptoms.mood == com.petal.app.data.model.MoodLevel.Irritable) {
-            adjustment += 0.2
+            adjustment += MOOD_ADJUSTMENT
         }
 
         // Severe headaches near menstruation can indicate estrogen withdrawal,
         // which in some cases correlates with slightly shorter follicular phases
         if (symptoms.headaches == SymptomLevel.Severe) {
-            adjustment -= 0.15
+            adjustment += HEADACHE_ADJUSTMENT
         }
 
         // Detect trend in recent cycle lengths (are cycles getting longer or shorter?)
         if (cycles.size >= 3) {
             val recentTrend = detectTrend(cycles.take(6).map { it.cycleLength.toDouble() })
             // Apply a mild trend-following adjustment (damped to avoid overcorrection)
-            adjustment += recentTrend * 0.3
+            adjustment += recentTrend * TREND_DAMPING_FACTOR
         }
 
         // Clamp total adjustment to avoid wild swings
-        val clampedAdjustment = adjustment.coerceIn(-1.5, 1.5)
+        val clampedAdjustment = adjustment.coerceIn(-MAX_SYMPTOM_ADJUSTMENT, MAX_SYMPTOM_ADJUSTMENT)
 
         return basePrediction + clampedAdjustment
     }
@@ -228,8 +272,8 @@ class BayesianPredictor @Inject constructor() {
     fun detectTemperatureTrend(temperatures: List<Double>): String {
         if (temperatures.size < 6) return "insufficient_data"
 
-        // Split into baseline (first ~60%) and recent (last ~40%)
-        val splitPoint = (temperatures.size * 0.6).toInt()
+        // Split into baseline and recent portions
+        val splitPoint = (temperatures.size * TEMP_BASELINE_FRACTION).toInt()
         val baseline = temperatures.take(splitPoint)
         val recent = temperatures.drop(splitPoint)
 
@@ -238,11 +282,10 @@ class BayesianPredictor @Inject constructor() {
         val baselineMean = baseline.average()
         val recentMean = recent.average()
 
-        // A thermal shift of 0.2+ degrees sustained over 3+ days suggests post-ovulation
         val shift = recentMean - baselineMean
-        val sustainedRise = recent.count { it > baselineMean + 0.1 }
+        val sustainedRise = recent.count { it > baselineMean + TEMP_RISE_SENSITIVITY }
 
-        return if (shift >= 0.2 && sustainedRise >= 3) {
+        return if (shift >= TEMP_SHIFT_THRESHOLD && sustainedRise >= TEMP_SUSTAINED_RISE_MIN) {
             "post_ovulation"
         } else {
             "pre_ovulation"
@@ -254,15 +297,11 @@ class BayesianPredictor @Inject constructor() {
      * More observations and lower posterior std = higher confidence.
      */
     private fun computeConfidence(numObservations: Int, posteriorStd: Double): Double {
-        // Observation factor: saturates around 8-10 cycles
-        val observationFactor = 1.0 - exp(-numObservations / 4.0)
+        val observationFactor = 1.0 - exp(-numObservations / CONFIDENCE_OBS_SCALE)
 
-        // Precision factor: lower std = higher confidence
-        // A std of 1 day = very confident, std of 4+ days = low confidence
-        val precisionFactor = max(0.0, 1.0 - posteriorStd / 5.0)
+        val precisionFactor = max(0.0, 1.0 - posteriorStd / CONFIDENCE_STD_CEILING)
 
-        // Combined score, weighted toward precision
-        val combined = 0.4 * observationFactor + 0.6 * precisionFactor
+        val combined = CONFIDENCE_OBS_WEIGHT * observationFactor + CONFIDENCE_PRECISION_WEIGHT * precisionFactor
 
         return combined.coerceIn(0.0, 1.0)
     }

@@ -91,8 +91,10 @@ class CycleRepository @Inject constructor(
             if (response.isSuccessful) {
                 cycleEntryDao.markSynced(id)
             }
-        } catch (_: Exception) {
-            // Will sync later via WorkManager
+        } catch (_: java.io.IOException) {
+            // Network unavailable — will sync later via WorkManager
+        } catch (_: retrofit2.HttpException) {
+            // Server error — will retry in background sync
         }
 
         return entry
@@ -102,8 +104,10 @@ class CycleRepository @Inject constructor(
         cycleEntryDao.deleteById(userId, entryId)
         try {
             apiService.deleteCycleEntry(entryId)
-        } catch (_: Exception) {
-            // Will handle in background sync
+        } catch (_: java.io.IOException) {
+            // Network unavailable — deletion will propagate on next sync
+        } catch (_: retrofit2.HttpException) {
+            // Server error — will retry
         }
     }
 
@@ -152,12 +156,16 @@ class CycleRepository @Inject constructor(
                     if (result.isSuccessful) {
                         cycleEntryDao.markSynced(entry.id)
                     }
-                } catch (_: Exception) {
-                    break // Stop trying if network fails
+                } catch (_: java.io.IOException) {
+                    break // Stop trying if network is unavailable
+                } catch (_: retrofit2.HttpException) {
+                    break // Server error — stop batch and retry later
                 }
             }
-        } catch (_: Exception) {
-            // Offline — will retry later
+        } catch (_: java.io.IOException) {
+            // Offline — will retry later via WorkManager
+        } catch (_: retrofit2.HttpException) {
+            // Server error — will retry later
         }
     }
 

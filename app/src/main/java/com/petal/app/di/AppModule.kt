@@ -29,7 +29,13 @@ object AppModule {
         context,
         PetalDatabase::class.java,
         PetalDatabase.DATABASE_NAME
-    ).fallbackToDestructiveMigration().build()
+    )
+        // Proper migrations should be added here as schema evolves:
+        // .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+        // fallbackToDestructiveMigration is only used as a last resort to avoid crashes
+        // on unhandled schema changes. Prefer explicit migrations to preserve user data.
+        .fallbackToDestructiveMigration()
+        .build()
 
     @Provides
     @Singleton

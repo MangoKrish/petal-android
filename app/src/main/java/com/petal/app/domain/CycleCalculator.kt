@@ -18,6 +18,44 @@ import kotlin.math.roundToInt
 @Singleton
 class CycleCalculator @Inject constructor() {
 
+    companion object {
+        /** Default assumed cycle length when no data is available. */
+        const val DEFAULT_CYCLE_LENGTH = 28
+
+        /** Menstrual phase spans the first N days. */
+        const val MENSTRUAL_PHASE_END_DAY = 5
+
+        /** Follicular phase ends at approximately 46% of the cycle. */
+        const val FOLLICULAR_PHASE_RATIO = 0.46
+
+        /** Ovulation window lasts approximately 2 days after follicular ends. */
+        const val OVULATION_WINDOW_DAYS = 2
+
+        /** Ovulation typically occurs ~14 days before the next period. */
+        const val LUTEAL_PHASE_LENGTH = 14
+
+        /** Fertile window extends 3 days on either side of ovulation. */
+        const val FERTILE_WINDOW_RADIUS = 3
+
+        /** A spread of 7+ days between shortest/longest cycle indicates irregularity. */
+        const val IRREGULARITY_THRESHOLD = 7
+
+        /** Short cycle flag threshold. */
+        const val SHORT_CYCLE_THRESHOLD = 21
+
+        /** Long cycle flag threshold. */
+        const val LONG_CYCLE_THRESHOLD = 35
+
+        /** Long period flag threshold (days). */
+        const val LONG_PERIOD_THRESHOLD = 8
+
+        /** Minimum logged cycles before predictions are considered baseline. */
+        const val BASELINE_CYCLE_COUNT = 3
+
+        /** Maximum pattern flags shown to the user. */
+        const val MAX_PATTERN_FLAGS = 4
+    }
+
     private fun parseDate(date: String): LocalDate =
         LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
 
@@ -42,7 +80,7 @@ class CycleCalculator @Inject constructor() {
      * Defaults to 28 if no cycles are logged.
      */
     fun getAverageCycleLength(cycles: List<CycleLog>): Int {
-        if (cycles.isEmpty()) return 28
+        if (cycles.isEmpty()) return DEFAULT_CYCLE_LENGTH
         val total = cycles.sumOf { it.cycleLength }
         return (total.toDouble() / cycles.size).roundToInt()
     }
@@ -52,7 +90,7 @@ class CycleCalculator @Inject constructor() {
      * Uses anchor date + average cycle length.
      */
     fun getNextPeriodDate(cycles: List<CycleLog>): LocalDate {
-        if (cycles.isEmpty()) return LocalDate.now().plusDays(28)
+        if (cycles.isEmpty()) return LocalDate.now().plusDays(DEFAULT_CYCLE_LENGTH.toLong())
         val average = getAverageCycleLength(cycles)
         val anchor = getCycleAnchorDate(cycles, LocalDate.now())
         return addDays(anchor, average)
@@ -64,10 +102,10 @@ class CycleCalculator @Inject constructor() {
      * If the calculated date is in the past, rolls forward by one cycle.
      */
     fun getOvulationDate(cycles: List<CycleLog>): LocalDate {
-        if (cycles.isEmpty()) return LocalDate.now().plusDays(14)
+        if (cycles.isEmpty()) return LocalDate.now().plusDays(LUTEAL_PHASE_LENGTH.toLong())
         val average = getAverageCycleLength(cycles)
         val today = LocalDate.now()
-        var ovulation = addDays(getCycleAnchorDate(cycles, today), average - 14)
+        var ovulation = addDays(getCycleAnchorDate(cycles, today), average - LUTEAL_PHASE_LENGTH)
         if (ovulation.isBefore(today)) {
             ovulation = addDays(ovulation, average)
         }
@@ -79,7 +117,10 @@ class CycleCalculator @Inject constructor() {
      */
     fun getFertileWindow(cycles: List<CycleLog>): Pair<LocalDate, LocalDate> {
         val ovulation = getOvulationDate(cycles)
-        return Pair(ovulation.minusDays(3), ovulation.plusDays(3))
+        return Pair(
+            ovulation.minusDays(FERTILE_WINDOW_RADIUS.toLong()),
+            ovulation.plusDays(FERTILE_WINDOW_RADIUS.toLong())
+        )
     }
 
     /**
@@ -93,11 +134,11 @@ class CycleCalculator @Inject constructor() {
     fun getCurrentPhase(cycles: List<CycleLog>): CyclePhase {
         val average = getAverageCycleLength(cycles)
         val dayInCycle = getCurrentCycleDay(cycles)
-        val follicularEnd = max(6, (average * 0.46).roundToInt())
-        val ovulationEnd = min(average, follicularEnd + 2)
+        val follicularEnd = max(MENSTRUAL_PHASE_END_DAY + 1, (average * FOLLICULAR_PHASE_RATIO).roundToInt())
+        val ovulationEnd = min(average, follicularEnd + OVULATION_WINDOW_DAYS)
 
         return when {
-            dayInCycle <= 5 -> CyclePhase.Menstrual
+            dayInCycle <= MENSTRUAL_PHASE_END_DAY -> CyclePhase.Menstrual
             dayInCycle <= follicularEnd -> CyclePhase.Follicular
             dayInCycle <= ovulationEnd -> CyclePhase.Ovulation
             else -> CyclePhase.Luteal
@@ -111,7 +152,7 @@ class CycleCalculator @Inject constructor() {
     fun detectIrregularity(cycles: List<CycleLog>): Boolean {
         if (cycles.size < 2) return false
         val lengths = cycles.map { it.cycleLength }
-        return (lengths.max() - lengths.min()) >= 7
+        return (lengths.max() - lengths.min()) >= IRREGULARITY_THRESHOLD
     }
 
     /**
@@ -188,7 +229,7 @@ class CycleCalculator @Inject constructor() {
         )
 
         // Flag 1: Baseline building
-        if (cycles.size < 3) {
+        if (cycles.size < BASELINE_CYCLE_COUNT) {
             flags.add(
                 CyclePatternFlag(
                     id = "baseline-building",
@@ -200,7 +241,7 @@ class CycleCalculator @Inject constructor() {
         }
 
         // Flag 2: Cycle variation
-        if (spread >= 7) {
+        if (spread >= IRREGULARITY_THRESHOLD) {
             flags.add(
                 CyclePatternFlag(
                     id = "cycle-variation",
@@ -212,7 +253,7 @@ class CycleCalculator @Inject constructor() {
         }
 
         // Flag 3: Short cycles
-        if (averageCycle < 21) {
+        if (averageCycle < SHORT_CYCLE_THRESHOLD) {
             flags.add(
                 CyclePatternFlag(
                     id = "short-cycles",
@@ -224,7 +265,7 @@ class CycleCalculator @Inject constructor() {
         }
 
         // Flag 4: Long cycles
-        if (averageCycle > 35) {
+        if (averageCycle > LONG_CYCLE_THRESHOLD) {
             flags.add(
                 CyclePatternFlag(
                     id = "long-cycles",
@@ -236,7 +277,7 @@ class CycleCalculator @Inject constructor() {
         }
 
         // Flag 5: Long periods
-        if (averagePeriodLength >= 8) {
+        if (averagePeriodLength >= LONG_PERIOD_THRESHOLD) {
             flags.add(
                 CyclePatternFlag(
                     id = "long-periods",
@@ -259,7 +300,7 @@ class CycleCalculator @Inject constructor() {
             )
         }
 
-        return flags.take(4)
+        return flags.take(MAX_PATTERN_FLAGS)
     }
 
     /**
