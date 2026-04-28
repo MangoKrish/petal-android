@@ -17,11 +17,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.petal.app.data.model.FlowIntensity
 import com.petal.app.ui.components.PetalCard
 import com.petal.app.ui.theme.*
 import com.petal.app.ui.viewmodel.CalendarDayInfo
 import com.petal.app.ui.viewmodel.CalendarViewModel
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -34,6 +36,16 @@ fun CalendarScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+    var quickLogDate by remember { mutableStateOf<LocalDate?>(null) }
+
+    CalendarQuickLogSheet(
+        visible = quickLogDate != null,
+        targetDate = quickLogDate,
+        onSave = { flow, symptoms ->
+            quickLogDate?.let { d -> viewModel.saveQuickLog(d, flow, symptoms) }
+        },
+        onDismiss = { quickLogDate = null },
+    )
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -151,6 +163,7 @@ fun CalendarScreen(
                                                 viewModel.selectDate(dayInfo.date)
                                                 onNavigateToLog(dayInfo)
                                             },
+                                            onLongClick = { quickLogDate = dayInfo.date },
                                             modifier = Modifier.weight(1f)
                                         )
                                     } else {

@@ -139,8 +139,9 @@ fun PetalTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        // Kawaii redesign: Sakura (light) / Yozakura (dark) palettes by default
+        darkTheme -> KawaiiDarkColorScheme
+        else -> KawaiiLightColorScheme
     }
 
     // Phase-aware extended colors

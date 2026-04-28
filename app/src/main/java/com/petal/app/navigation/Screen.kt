@@ -47,4 +47,7 @@ sealed class Screen(val route: String) {
     data object Referral : Screen("referral")
     data object Journal : Screen("journal")
     data object Achievements : Screen("achievements")
+
+    // Kawaii redesign: messaging
+    data object Messages : Screen("messages")
 }

@@ -20,8 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.petal.app.ui.components.PetalCard
+import com.petal.app.ui.components.kawaii.DailyFlowChart
+import com.petal.app.ui.components.kawaii.PeriodTimeline
 import com.petal.app.ui.theme.*
 import com.petal.app.ui.viewmodel.InsightsViewModel
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +54,35 @@ fun ChartsScreen(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Kawaii: Flow-trend bar chart for the last cycle (always visible)
+            run {
+                val lastEntry = uiState.entries.firstOrNull()
+                val flows: List<com.petal.app.data.model.FlowIntensity?> = if (lastEntry != null) {
+                    val start = LocalDate.parse(lastEntry.start)
+                    val end = LocalDate.parse(lastEntry.end)
+                    val days = java.time.temporal.ChronoUnit.DAYS.between(start, end).toInt() + 1
+                    List(days.coerceAtLeast(1)) { lastEntry.flowIntensity }
+                } else emptyList()
+                DailyFlowChart(flows = flows)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Kawaii: Period timeline + "days like this" suggestions
+            run {
+                val timelineEntries = uiState.entries.take(6).map { entry ->
+                    com.petal.app.ui.components.kawaii.PeriodTimelineEntry(
+                        startLabel = entry.start,
+                        days = (java.time.temporal.ChronoUnit.DAYS
+                            .between(LocalDate.parse(entry.start), LocalDate.parse(entry.end))
+                            .toInt() + 1).coerceIn(1, 14),
+                        flowIntensity = entry.flowIntensity,
+                        topMood = entry.moodLevel.display,
+                    )
+                }
+                PeriodTimeline(entries = timelineEntries)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             if (uiState.cycleLengths.isEmpty()) {
                 PetalCard {

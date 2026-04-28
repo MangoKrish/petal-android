@@ -235,3 +235,56 @@ data class SyncResponse(
     val deletedIds: List<String>,
     val syncedAt: String
 )
+
+// ---- Partner Messaging ----
+
+@Serializable
+data class PartnerThreadDto(
+    val threadId: String,
+    val partnerId: String,
+    val partnerName: String,
+    val lastMessageAt: String? = null
+)
+
+@Serializable
+data class PartnerMessageDto(
+    val id: String,
+    val threadId: String,
+    val senderId: String,
+    val content: String,
+    val sentAt: String,
+    val readAt: String? = null
+)
+
+@Serializable
+data class SendMessageRequest(
+    val content: String
+)
+
+@Serializable
+data class MarkReadResponse(
+    val updated: Int
+)
+
+// ---- API envelopes ----
+
+@Serializable
+data class ApiEnvelope<T>(
+    val success: Boolean,
+    val data: T? = null
+)
+
+// ---- Notifications / device registration ----
+
+@Serializable
+data class RegisterDeviceRequest(
+    val deviceToken: String,
+    val platform: String = "android",
+    val deviceName: String,
+    val appVersion: String,
+)
+
+@Serializable
+data class RegisterDeviceResponse(
+    val deviceId: String? = null,
+)

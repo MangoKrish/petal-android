@@ -1,8 +1,9 @@
 package com.petal.app.ui.screens.calendar
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
@@ -18,12 +19,14 @@ import androidx.compose.ui.unit.dp
 import com.petal.app.ui.theme.*
 import com.petal.app.ui.viewmodel.CalendarDayInfo
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CalendarDayCell(
     dayInfo: CalendarDayInfo,
     isSelected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
 ) {
     val bgColor = when {
         dayInfo.isPeriodDay -> Rose500
@@ -56,7 +59,10 @@ fun CalendarDayCell(
                 color = borderColor,
                 shape = RoundedCornerShape(16.dp)
             )
-            .clickable(onClick = onClick),
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            ),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

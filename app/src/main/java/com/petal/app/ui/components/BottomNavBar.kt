@@ -24,31 +24,31 @@ private data class NavItem(
 private val navItems = listOf(
     NavItem(
         route = Screen.Dashboard.route,
-        label = "Home",
+        label = "home",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
     ),
     NavItem(
         route = Screen.Calendar.route,
-        label = "Calendar",
+        label = "calendar",
         selectedIcon = Icons.Filled.CalendarMonth,
         unselectedIcon = Icons.Outlined.CalendarMonth
     ),
     NavItem(
         route = Screen.QuickLog.baseRoute,
-        label = "Log",
+        label = "log",
         selectedIcon = Icons.Filled.AddCircle,
         unselectedIcon = Icons.Outlined.AddCircle
     ),
     NavItem(
-        route = Screen.Partner.route,
-        label = "Partner",
+        route = Screen.Messages.route,
+        label = "talk",
         selectedIcon = Icons.Filled.Favorite,
         unselectedIcon = Icons.Outlined.FavoriteBorder
     ),
     NavItem(
         route = Screen.Settings.route,
-        label = "Settings",
+        label = "me",
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )

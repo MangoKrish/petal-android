@@ -16,19 +16,29 @@ import com.petal.app.ui.theme.ThemeMode
 import com.petal.app.navigation.PetalNavGraph
 import com.petal.app.ui.theme.PetalTheme
 import com.petal.app.ui.viewmodel.SettingsViewModel
+import com.petal.app.data.repository.PushDeviceRegistrar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject lateinit var dataStore: DataStore<Preferences>
+    @Inject lateinit var pushRegistrar: PushDeviceRegistrar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Best-effort: register the FCM token so the backend can push partner-message
+        // notifications. Failure is silent — we'll retry on next launch.
+        lifecycleScope.launch {
+            runCatching { pushRegistrar.registerIfNeeded() }
+        }
 
         setContent {
             val themeMode by dataStore.data

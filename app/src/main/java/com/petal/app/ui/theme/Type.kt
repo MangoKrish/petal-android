@@ -7,9 +7,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Using system default serif and sans-serif as fallbacks for DM Serif and DM Sans
-// In production, you would include the actual font files in res/font/
-val PetalDisplayFamily = FontFamily.Serif
+// Kawaii redesign: rounded sans-serif everywhere (M PLUS Rounded 1c spirit).
+// Falls back to the system rounded sans (Android Roboto).
+val PetalDisplayFamily = FontFamily.SansSerif
 val PetalBodyFamily = FontFamily.SansSerif
 
 val PetalTypography = Typography(
@@ -38,24 +38,24 @@ val PetalTypography = Typography(
     // Headline
     headlineLarge = TextStyle(
         fontFamily = PetalDisplayFamily,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Medium,
         fontSize = 32.sp,
         lineHeight = 40.sp,
-        letterSpacing = 0.sp
+        letterSpacing = (-0.2).sp
     ),
     headlineMedium = TextStyle(
         fontFamily = PetalDisplayFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 28.sp,
-        lineHeight = 36.sp,
-        letterSpacing = 0.sp
+        fontWeight = FontWeight.Medium,
+        fontSize = 26.sp,
+        lineHeight = 34.sp,
+        letterSpacing = (-0.15).sp
     ),
     headlineSmall = TextStyle(
         fontFamily = PetalDisplayFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 24.sp,
-        lineHeight = 32.sp,
-        letterSpacing = 0.sp
+        fontWeight = FontWeight.Medium,
+        fontSize = 22.sp,
+        lineHeight = 30.sp,
+        letterSpacing = (-0.1).sp
     ),
     // Title
     titleLarge = TextStyle(

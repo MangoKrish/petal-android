@@ -48,6 +48,7 @@ import com.petal.app.ui.screens.premium.PremiumScreen
 import com.petal.app.ui.screens.referral.ReferralScreen
 import com.petal.app.ui.screens.journal.JournalScreen
 import com.petal.app.ui.screens.achievements.AchievementsScreen
+import com.petal.app.ui.screens.messages.SoftTalksScreen
 import com.petal.app.ui.viewmodel.AuthViewModel
 
 @Composable
@@ -77,6 +78,7 @@ fun PetalNavGraph(
         Screen.QuickLog.route,
         Screen.QuickLog.baseRoute,
         Screen.Partner.route,
+        Screen.Messages.route,
         Screen.Settings.route
     )
 
@@ -338,6 +340,17 @@ fun PetalNavGraph(
             // Achievements
             composable(Screen.Achievements.route) {
                 AchievementsScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // Soft talks (partner messaging)
+            composable(Screen.Messages.route) {
+                val authVm: AuthViewModel = hiltViewModel()
+                val user by authVm.currentUser.collectAsState()
+                SoftTalksScreen(
+                    currentUserId = user?.id ?: "",
+                    isOnPeriod = false,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

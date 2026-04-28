@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.petal.app.data.model.CycleEntry
 import com.petal.app.data.model.CycleLog
 import com.petal.app.data.model.CyclePhase
+import com.petal.app.data.model.FlowIntensity
+import com.petal.app.data.model.MoodLevel
+import com.petal.app.data.model.SymptomLevel
 import com.petal.app.data.repository.AuthRepository
 import com.petal.app.data.repository.CycleRepository
 import com.petal.app.domain.CycleCalculator
@@ -81,6 +84,41 @@ class CalendarViewModel @Inject constructor(
             !date.isBefore(start) && !date.isAfter(end)
         }
         _uiState.update { it.copy(selectedDate = date, selectedEntry = entry) }
+    }
+
+    /**
+     * Long-press quick log: writes a single-day cycle entry on [date] using the
+     * provided flow + symptoms. If no flow is provided, only mood/symptom data
+     * is recorded (still as a one-day entry so it shows on the calendar).
+     */
+    fun saveQuickLog(date: LocalDate, flow: FlowIntensity?, symptoms: List<String>) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val effectiveFlow = flow ?: FlowIntensity.Light
+            val cramps = if (symptoms.any { it.contains("cramp", true) }) SymptomLevel.Moderate else SymptomLevel.None
+            val headaches = if (symptoms.any { it.contains("headache", true) }) SymptomLevel.Moderate else SymptomLevel.None
+            val cravings = if (symptoms.any { it.contains("craving", true) || it.contains("acne", true) }) SymptomLevel.Mild else SymptomLevel.None
+            val mood = when {
+                symptoms.any { it.contains("moody", true) } -> MoodLevel.Irritable
+                symptoms.any { it.contains("tender", true) } -> MoodLevel.Sensitive
+                symptoms.any { it.contains("fatigue", true) } -> MoodLevel.Low
+                else -> MoodLevel.Calm
+            }
+            cycleRepository.saveEntry(
+                userId = userId,
+                entryId = null,
+                start = date.toString(),
+                end = date.toString(),
+                cycleLength = 28,
+                flowIntensity = effectiveFlow,
+                pain = SymptomLevel.None,
+                cramps = cramps,
+                cravings = cravings,
+                mood = mood,
+                headaches = headaches,
+            )
+            loadCalendar()
+        }
     }
 
     private fun buildCalendarDays(

@@ -13,8 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.petal.app.ui.components.kawaii.PetalStyle
+import com.petal.app.ui.components.kawaii.PetalStylePicker
 import com.petal.app.ui.theme.ThemeMode
 import com.petal.app.ui.viewmodel.SettingsViewModel
+import com.petal.app.ui.viewmodel.PetalStyleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,6 +105,21 @@ fun SettingsScreen(
                 selectedMode = uiState.themeMode,
                 onSelected = viewModel::updateThemeMode
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Kawaii: petal-style picker
+            run {
+                val styleVm: PetalStyleViewModel = hiltViewModel()
+                val style by styleVm.style.collectAsState(initial = PetalStyle.SAKURA)
+                val enabled by styleVm.enabled.collectAsState(initial = true)
+                PetalStylePicker(
+                    current = style,
+                    enabled = enabled,
+                    onSelectStyle = styleVm::setStyle,
+                    onToggleEnabled = styleVm::setEnabled,
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

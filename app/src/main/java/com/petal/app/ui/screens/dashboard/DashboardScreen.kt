@@ -20,8 +20,16 @@ import com.petal.app.data.model.FlagSeverity
 import com.petal.app.ui.components.PetalCard
 import com.petal.app.ui.components.PhaseGradientBackground
 import com.petal.app.ui.components.QuickLogBottomSheet
+import com.petal.app.ui.components.kawaii.BloomCard
+import com.petal.app.ui.components.kawaii.PetalChanCard
+import com.petal.app.ui.components.kawaii.SakuraPetalsBackground
+import com.petal.app.ui.components.kawaii.PetalStyle
 import com.petal.app.ui.theme.*
 import com.petal.app.ui.viewmodel.DashboardViewModel
+import com.petal.app.domain.PetalChanMoodEngine
+import com.petal.app.ui.viewmodel.PetalStyleViewModel
+import androidx.compose.foundation.layout.Box
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +71,14 @@ fun DashboardScreen(
         }
     )
 
+    val styleVm: PetalStyleViewModel = hiltViewModel()
+    val petalStyle by styleVm.style.collectAsState(initial = PetalStyle.SAKURA)
+    val petalEnabled by styleVm.enabled.collectAsState(initial = true)
+
     PhaseGradientBackground(phase = uiState.currentPhase) {
+        // Ambient sakura petals layered behind content (cheap, pretty)
+        SakuraPetalsBackground(style = petalStyle, enabled = petalEnabled)
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -73,21 +88,39 @@ fun DashboardScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Greeting with fade
+            // Kawaii greeting (lowercase, time-of-day + name)
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(600)) + slideInVertically(tween(600)) { -20 }
             ) {
-                Text(
-                    text = uiState.insights?.greeting ?: "Hello, ${uiState.userName}",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
+                val firstName = uiState.userName.split(" ").firstOrNull()?.lowercase() ?: "friend"
+                val hour = LocalDateTime.now().hour
+                val tod = when {
+                    hour < 12 -> "morning"
+                    hour < 17 -> "afternoon"
+                    hour < 21 -> "evening"
+                    else -> "late night"
+                }
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Text(
+                        text = "${LocalDateTime.now().dayOfWeek.name.lowercase()} $tod",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = "hi, $firstName ⋆˚",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Cycle Ring with scale-in
+            // Bloom Ring (kawaii) — replaces CycleRing
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(800, delayMillis = 200)) + scaleIn(
@@ -95,12 +128,27 @@ fun DashboardScreen(
                     initialScale = 0.8f
                 )
             ) {
-                CycleRing(
-                    cycleDay = uiState.cycleDay,
+                BloomCard(
+                    currentDay = uiState.cycleDay,
                     cycleLength = uiState.cycleLengthAvg,
-                    phase = uiState.currentPhase,
-                    daysUntilPeriod = uiState.daysUntilNextPeriod
+                    phase = uiState.currentPhase.display,
+                    daysUntilNext = uiState.daysUntilNextPeriod,
                 )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Petal-chan speech card
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(500, delayMillis = 350)) + slideInVertically(tween(500, delayMillis = 350)) { 20 }
+            ) {
+                val mood = PetalChanMoodEngine.moodFor(
+                    phase = uiState.currentPhase,
+                    isOnPeriod = uiState.currentPhase == com.petal.app.data.model.CyclePhase.Menstrual,
+                )
+                val quote = PetalChanMoodEngine.quoteFor(mood, uiState.cycleDay)
+                PetalChanCard(mood = mood, quote = quote)
             }
 
             Spacer(modifier = Modifier.height(24.dp))

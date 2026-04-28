@@ -5,6 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.petal.app.data.local.CycleEntryDao
 import com.petal.app.data.local.PetalDatabase
 import com.petal.app.data.local.UserDao
@@ -21,6 +23,16 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    // ─── Migrations ───────────────────────────────────────────────────────
+    // No-op v1→v2 placeholder so a future schema bump has a real upgrade path
+    // instead of falling back to destructive migration (which wipes user data).
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Intentionally empty: schema unchanged in v2.
+            // When real changes land, replace this with explicit DDL.
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(
@@ -30,11 +42,11 @@ object AppModule {
         PetalDatabase::class.java,
         PetalDatabase.DATABASE_NAME
     )
-        // Proper migrations should be added here as schema evolves:
-        // .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-        // fallbackToDestructiveMigration is only used as a last resort to avoid crashes
-        // on unhandled schema changes. Prefer explicit migrations to preserve user data.
-        .fallbackToDestructiveMigration()
+        .addMigrations(MIGRATION_1_2)
+        // Last-resort safety net only on truly unhandled bumps. Prefer explicit
+        // migrations above; this prevents installs from crash-looping if a dev
+        // forgets to add one.
+        .fallbackToDestructiveMigrationOnDowngrade()
         .build()
 
     @Provides

@@ -87,4 +87,24 @@ interface PetalApiService {
     // Sync
     @POST("sync")
     suspend fun syncEntries(@Body request: SyncRequest): Response<SyncResponse>
+
+    // ---- Partner Messaging ----
+    @GET("messages/thread")
+    suspend fun getMessagingThread(): Response<ApiEnvelope<PartnerThreadDto?>>
+
+    @GET("messages")
+    suspend fun listMessages(@Query("limit") limit: Int = 100): Response<ApiEnvelope<List<PartnerMessageDto>>>
+
+    @POST("messages")
+    suspend fun sendMessage(@Body request: SendMessageRequest): Response<ApiEnvelope<PartnerMessageDto>>
+
+    @POST("messages/read")
+    suspend fun markMessagesRead(): Response<ApiEnvelope<MarkReadResponse>>
+
+    @DELETE("messages/{id}")
+    suspend fun deleteMessage(@Path("id") id: String): Response<ApiEnvelope<Unit>>
+
+    // ---- Notifications / device registration ----
+    @POST("notifications/register-device")
+    suspend fun registerDevice(@Body request: RegisterDeviceRequest): Response<ApiEnvelope<RegisterDeviceResponse>>
 }

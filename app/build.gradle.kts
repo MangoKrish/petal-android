@@ -119,6 +119,7 @@ dependencies {
     // Coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
+    implementation(libs.coroutines.play.services)
 
     // DataStore
     implementation(libs.datastore.preferences)
