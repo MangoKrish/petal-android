@@ -30,6 +30,7 @@ fun SettingsScreen(
     onNavigateToJournal: () -> Unit = {},
     onNavigateToAchievements: () -> Unit = {},
     onNavigateToGroups: () -> Unit = {},
+    onNavigateToQuiz: () -> Unit = {},
     onLogout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
@@ -235,6 +236,14 @@ fun SettingsScreen(
                 title = "Friend groups",
                 subtitle = "Wellness scoreboard with people you trust",
                 onClick = onNavigateToGroups
+            )
+
+            // PHASE_6_7_PLAN.md §6B.4 — daily quiz
+            SettingsNavItem(
+                icon = Icons.Default.Lightbulb,
+                title = "Daily quiz",
+                subtitle = "5 questions · myth-bust together",
+                onClick = onNavigateToQuiz
             )
 
             SettingsNavItem(

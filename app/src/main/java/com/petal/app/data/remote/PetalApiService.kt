@@ -163,4 +163,14 @@ interface PetalApiService {
     // ---- Notifications / device registration ----
     @POST("notifications/register-device")
     suspend fun registerDevice(@Body request: RegisterDeviceRequest): Response<ApiEnvelope<RegisterDeviceResponse>>
+
+    // PHASE_6_7_PLAN.md §6B.4 — daily quiz
+    @GET("quiz/today")
+    suspend fun getQuizToday(): Response<ApiEnvelope<DailyQuizSetDto>>
+
+    @POST("quiz/answer")
+    suspend fun answerQuiz(@Body request: AnswerQuizRequest): Response<ApiEnvelope<AnswerQuizResponseDto>>
+
+    @GET("quiz/stats")
+    suspend fun getQuizStats(): Response<ApiEnvelope<QuizStatsDto>>
 }

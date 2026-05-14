@@ -27,6 +27,7 @@ import com.petal.app.ui.screens.auth.SignUpScreen
 import com.petal.app.ui.screens.groups.GroupDetailScreen
 import com.petal.app.ui.screens.groups.GroupsScreen
 import com.petal.app.ui.screens.partner.SupporterDashboardScreen
+import com.petal.app.ui.screens.quiz.QuizScreen
 import com.petal.app.ui.screens.stories.StoriesScreen
 import com.petal.app.ui.screens.calendar.CalendarScreen
 import com.petal.app.ui.screens.dashboard.DashboardScreen
@@ -91,7 +92,8 @@ fun PetalNavGraph(
         Screen.Messages.route,
         Screen.Settings.route,
         Screen.SupporterHome.route,
-        Screen.Stories.route
+        Screen.Stories.route,
+        Screen.Quiz.route
     )
 
     val navContent: @Composable (Modifier) -> Unit = { modifier ->
@@ -320,6 +322,7 @@ fun PetalNavGraph(
                     onNavigateToJournal = { navController.navigate(Screen.Journal.route) },
                     onNavigateToAchievements = { navController.navigate(Screen.Achievements.route) },
                     onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
+                    onNavigateToQuiz = { navController.navigate(Screen.Quiz.route) },
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
@@ -406,6 +409,12 @@ fun PetalNavGraph(
                     groupId = groupId,
                     onNavigateBack = { navController.popBackStack() }
                 )
+            }
+
+            // PHASE_6_7_PLAN.md §6B.4 — daily quiz. Reachable from Settings
+            // and (for supporters) the supporter dashboard.
+            composable(Screen.Quiz.route) {
+                QuizScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }

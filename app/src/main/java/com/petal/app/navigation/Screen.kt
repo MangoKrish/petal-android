@@ -62,4 +62,7 @@ sealed class Screen(val route: String) {
     data object GroupDetail : Screen("groups/{id}") {
         fun createRoute(id: String) = "groups/$id"
     }
+
+    // PHASE_6_7_PLAN.md §6B.4 — daily quiz
+    data object Quiz : Screen("quiz")
 }

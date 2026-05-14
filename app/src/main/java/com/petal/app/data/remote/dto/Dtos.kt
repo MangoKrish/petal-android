@@ -395,3 +395,62 @@ data class RegisterDeviceRequest(
 data class RegisterDeviceResponse(
     val deviceId: String? = null,
 )
+
+// ---- Quiz (PHASE_6_7_PLAN.md §6B.4) ----
+
+@Serializable
+data class QuizQuestionOptionDto(
+    val key: String,
+    val text: String,
+)
+
+@Serializable
+data class QuizAttemptDto(
+    val selectedKey: String,
+    val correct: Boolean,
+    val correctKey: String,
+    val explanation: String,
+)
+
+@Serializable
+data class DailyQuizQuestionDto(
+    val id: String,
+    val category: String,
+    val difficulty: String,
+    val prompt: String,
+    val options: List<QuizQuestionOptionDto>,
+    val source: String? = null,
+    val audience: String,
+    val attempt: QuizAttemptDto? = null,
+)
+
+@Serializable
+data class DailyQuizSetDto(
+    val forDate: String,
+    val questions: List<DailyQuizQuestionDto>,
+    val completed: Boolean,
+    val answeredCount: Int,
+)
+
+@Serializable
+data class QuizStatsDto(
+    val lifetimeCorrect: Int,
+    val lifetimeAnswered: Int,
+    val currentStreakDays: Int,
+    val longestStreakDays: Int,
+    val todayCompleted: Boolean,
+)
+
+@Serializable
+data class AnswerQuizRequest(
+    val questionId: String,
+    val selectedKey: String,
+)
+
+@Serializable
+data class AnswerQuizResponseDto(
+    val correct: Boolean,
+    val correctKey: String,
+    val explanation: String,
+    val setCompleted: Boolean,
+)
