@@ -173,4 +173,7 @@ interface PetalApiService {
 
     @GET("quiz/stats")
     suspend fun getQuizStats(): Response<ApiEnvelope<QuizStatsDto>>
+
+    @GET("quiz/history")
+    suspend fun getQuizHistory(@Query("days") days: Int = 14): Response<ApiEnvelope<List<QuizHistoryEntryDto>>>
 }

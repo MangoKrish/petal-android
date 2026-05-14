@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.petal.app.data.remote.dto.DailyQuizQuestionDto
 import com.petal.app.data.remote.dto.DailyQuizSetDto
 import com.petal.app.data.remote.dto.QuizAttemptDto
+import com.petal.app.data.remote.dto.QuizHistoryEntryDto
 import com.petal.app.data.remote.dto.QuizStatsDto
 import com.petal.app.data.repository.QuizRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +24,7 @@ data class QuizUiState(
     val isLoading: Boolean = true,
     val set: DailyQuizSetDto? = null,
     val stats: QuizStatsDto? = null,
+    val history: List<QuizHistoryEntryDto> = emptyList(),
     val activeIndex: Int = 0,
     val pendingAnswerKey: String? = null,
     val error: String? = null,
@@ -43,8 +45,10 @@ class QuizViewModel @Inject constructor(
             _ui.update { it.copy(isLoading = true, error = null) }
             val setRes = repository.fetchToday()
             val statsRes = repository.stats()
+            val historyRes = repository.history(14)
             val set = setRes.getOrNull()
             val stats = statsRes.getOrNull()
+            val history = historyRes.getOrDefault(emptyList())
             val initialIdx = set?.questions?.indexOfFirst { it.attempt == null }
                 ?.let { if (it < 0) (set.questions.size - 1).coerceAtLeast(0) else it }
                 ?: 0
@@ -53,6 +57,7 @@ class QuizViewModel @Inject constructor(
                     isLoading = false,
                     set = set,
                     stats = stats,
+                    history = history,
                     activeIndex = initialIdx,
                     error = setRes.exceptionOrNull()?.message ?: statsRes.exceptionOrNull()?.message,
                 )
@@ -109,6 +114,9 @@ class QuizViewModel @Inject constructor(
                         // Refresh stats once the set completes so the streak ticks.
                         repository.stats().getOrNull()?.let { s -> _ui.update { it.copy(stats = s) } }
                     }
+                    // Refresh history so the just-answered question shows up in
+                    // the footer review list (PHASE_6_7_PLAN.md §6B.4).
+                    repository.history(14).getOrNull()?.let { h -> _ui.update { it.copy(history = h) } }
                 },
                 onFailure = { e -> _ui.update { it.copy(pendingAnswerKey = null, error = e.message) } },
             )

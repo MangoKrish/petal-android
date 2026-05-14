@@ -4,6 +4,7 @@ import com.petal.app.data.remote.PetalApiService
 import com.petal.app.data.remote.dto.AnswerQuizRequest
 import com.petal.app.data.remote.dto.AnswerQuizResponseDto
 import com.petal.app.data.remote.dto.DailyQuizSetDto
+import com.petal.app.data.remote.dto.QuizHistoryEntryDto
 import com.petal.app.data.remote.dto.QuizStatsDto
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,5 +36,11 @@ class QuizRepository @Inject constructor(
         val body = r.body()?.data
         if (r.isSuccessful && body != null) Result.success(body)
         else Result.failure(Exception("Couldn’t load quiz stats."))
+    } catch (e: Exception) { Result.failure(e) }
+
+    suspend fun history(days: Int = 14): Result<List<QuizHistoryEntryDto>> = try {
+        val r = api.getQuizHistory(days)
+        if (r.isSuccessful) Result.success(r.body()?.data ?: emptyList())
+        else Result.failure(Exception("Couldn’t load history."))
     } catch (e: Exception) { Result.failure(e) }
 }

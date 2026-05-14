@@ -347,10 +347,14 @@ data class ScoreboardEntryDto(
     val hydrationScore: Int,
     val sleepScore: Int,
     val exerciseScore: Int,
+    /** PHASE_6_7_PLAN.md §6B.4 — quiz contribution (accuracy × engagement). */
+    val quizScore: Int = 0,
     val totalScore: Int,
     val hydrationStreakDays: Int,
     val avgSleepHours: Double,
     val totalExerciseMinutes: Int,
+    val quizCorrect: Int = 0,
+    val quizAnswered: Int = 0,
 )
 
 @Serializable
@@ -453,4 +457,14 @@ data class AnswerQuizResponseDto(
     val correctKey: String,
     val explanation: String,
     val setCompleted: Boolean,
+)
+
+@Serializable
+data class QuizHistoryEntryDto(
+    val attemptedAt: String,
+    val category: String,
+    val prompt: String,
+    val selectedKey: String,
+    val correct: Boolean,
+    val correctKey: String,
 )

@@ -192,7 +192,12 @@ fun GroupDetailScreen(
                                         )
                                     }
                                     Text(
-                                        "$rankCopy · hydration ${entry.hydrationStreakDays}d · sleep ${"%.1f".format(entry.avgSleepHours)}h · move ${entry.totalExerciseMinutes}m",
+                                        buildString {
+                                            append("$rankCopy · hydration ${entry.hydrationStreakDays}d · sleep ${"%.1f".format(entry.avgSleepHours)}h · move ${entry.totalExerciseMinutes}m")
+                                            if (entry.quizAnswered > 0) {
+                                                append(" · quiz ${entry.quizCorrect}/${entry.quizAnswered}")
+                                            }
+                                        },
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )

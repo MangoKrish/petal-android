@@ -25,9 +25,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.petal.app.data.remote.dto.DailyQuizQuestionDto
+import com.petal.app.data.remote.dto.QuizHistoryEntryDto
 import com.petal.app.data.remote.dto.QuizStatsDto
 import com.petal.app.ui.components.PetalCard
 import com.petal.app.ui.viewmodel.QuizViewModel
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * PHASE_6_7_PLAN.md §6B.4 — Daily quiz screen.
@@ -158,7 +163,88 @@ fun QuizScreen(
                 )
             }
 
+            if (state.history.isNotEmpty()) {
+                QuizHistorySection(history = state.history)
+            }
+
             Spacer(Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+private fun QuizHistorySection(history: List<QuizHistoryEntryDto>) {
+    val correct = history.count { it.correct }
+    val accuracy = if (history.isNotEmpty()) (correct * 100) / history.size else 0
+    val formatter = remember { DateTimeFormatter.ofPattern("MMM d", Locale.US).withZone(ZoneId.systemDefault()) }
+    PetalCard {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text(
+                        "RECENT ATTEMPTS",
+                        style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        "last 14 days",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    )
+                }
+                Text(
+                    "$accuracy%",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            history.take(10).forEach { h ->
+                val ts = runCatching { formatter.format(Instant.parse(h.attemptedAt)) }.getOrDefault("")
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        if (h.correct) {
+                            Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF4AA275))
+                        } else {
+                            Icon(Icons.Default.Close, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Text(
+                            "$ts · ${categoryLabel(h.category)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.widthIn(min = 96.dp),
+                        )
+                        Text(
+                            h.prompt,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+            }
+            if (history.size > 10) {
+                Text(
+                    "showing 10 of ${history.size} · keep going ♡",
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.labelSmall.copy(fontStyle = FontStyle.Italic),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }
