@@ -3,6 +3,7 @@ package com.petal.app.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.petal.app.data.model.User
+import com.petal.app.data.model.UserRole
 import com.petal.app.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -14,7 +15,9 @@ data class AuthUiState(
     val error: String? = null,
     val user: User? = null,
     val securityQuestion: String? = null,
-    val passwordResetSuccess: Boolean = false
+    val passwordResetSuccess: Boolean = false,
+    /** PHASE_6_7_PLAN.md §6A.1 — pre-auth role choice; null until the user picks. */
+    val pendingRole: UserRole? = null
 )
 
 @HiltViewModel
@@ -60,10 +63,11 @@ class AuthViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val result = authRepository.register(name, email, password, securityQuestion, securityAnswer)
+            val role = _uiState.value.pendingRole ?: UserRole.Primary
+            val result = authRepository.register(name, email, password, securityQuestion, securityAnswer, role)
             result.fold(
                 onSuccess = { user ->
-                    _uiState.update { it.copy(isLoading = false, user = user) }
+                    _uiState.update { it.copy(isLoading = false, user = user, pendingRole = null) }
                     onSuccess()
                 },
                 onFailure = { e ->
@@ -71,6 +75,16 @@ class AuthViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    /** PHASE_6_7_PLAN.md §6A.1 — pre-auth role chooser sets this; the
+     *  signup screen reads it and the register call attaches it. */
+    fun setPendingRole(role: UserRole) {
+        _uiState.update { it.copy(pendingRole = role) }
+    }
+
+    fun clearPendingRole() {
+        _uiState.update { it.copy(pendingRole = null) }
     }
 
     fun getSecurityQuestion(email: String) {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.petal.app.data.model.*
 import com.petal.app.data.repository.AuthRepository
 import com.petal.app.data.repository.CycleRepository
+import com.petal.app.data.repository.FertilityLogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -27,14 +28,22 @@ data class CycleLogUiState(
     val cravings: SymptomLevel = SymptomLevel.None,
     val mood: MoodLevel = MoodLevel.Calm,
     val headaches: SymptomLevel = SymptomLevel.None,
-    val editingEntryId: String? = null
+    val editingEntryId: String? = null,
+    // Today's fertility signals (PHASE_6_7_PLAN.md §6A.2). Saved to a
+    // separate daily-fertility-log row keyed by today's date.
+    val temperatureC: String = "",
+    val cervicalMucus: String? = null,
+    val ovulationPain: Boolean = false,
+    val lhTestResult: String? = null,
+    val sexualActivity: Boolean = false
 )
 
 @HiltViewModel
 class CycleLogViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val authRepository: AuthRepository,
-    private val cycleRepository: CycleRepository
+    private val cycleRepository: CycleRepository,
+    private val fertilityLogRepository: FertilityLogRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CycleLogUiState())
@@ -52,6 +61,20 @@ class CycleLogViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val latestEntry = cycleRepository.getLatestEntry(userId)
             val initialDate = requestedDate?.let(LocalDate::parse) ?: LocalDate.now()
+
+            // Pre-fill today's fertility log if any
+            val todaysFertility = fertilityLogRepository.getForDate(userId, LocalDate.now())
+            if (todaysFertility != null) {
+                _uiState.update {
+                    it.copy(
+                        temperatureC = todaysFertility.temperature?.toString() ?: "",
+                        cervicalMucus = todaysFertility.cervicalMucus,
+                        ovulationPain = todaysFertility.ovulationPain,
+                        lhTestResult = todaysFertility.lhTestResult,
+                        sexualActivity = todaysFertility.sexualActivity
+                    )
+                }
+            }
 
             if (requestedEntryId != null) {
                 val entry = cycleRepository.getEntry(userId, requestedEntryId) ?: latestEntry
@@ -158,6 +181,23 @@ class CycleLogViewModel @Inject constructor(
         _uiState.update { it.copy(headaches = level) }
     }
 
+    // Fertility-signal updates (today's daily log).
+    fun updateTemperature(value: String) {
+        _uiState.update { it.copy(temperatureC = value) }
+    }
+    fun updateCervicalMucus(value: String?) {
+        _uiState.update { it.copy(cervicalMucus = value) }
+    }
+    fun updateOvulationPain(value: Boolean) {
+        _uiState.update { it.copy(ovulationPain = value) }
+    }
+    fun updateLhTestResult(value: String?) {
+        _uiState.update { it.copy(lhTestResult = value) }
+    }
+    fun updateSexualActivity(value: Boolean) {
+        _uiState.update { it.copy(sexualActivity = value) }
+    }
+
     fun save(onSuccess: () -> Unit) {
         viewModelScope.launch {
             val state = _uiState.value
@@ -180,6 +220,25 @@ class CycleLogViewModel @Inject constructor(
                     mood = state.mood,
                     headaches = state.headaches
                 )
+
+                // Persist today's fertility signals if anything was entered.
+                val tempNum = state.temperatureC.trim().toDoubleOrNull()
+                val anyFertilityInput = tempNum != null ||
+                    state.cervicalMucus != null ||
+                    state.ovulationPain ||
+                    state.lhTestResult != null ||
+                    state.sexualActivity
+                if (anyFertilityInput) {
+                    fertilityLogRepository.upsert(
+                        userId = userId,
+                        date = LocalDate.now(),
+                        temperature = tempNum?.takeIf { it in 35.0..42.0 },
+                        cervicalMucus = state.cervicalMucus,
+                        ovulationPain = state.ovulationPain,
+                        lhTestResult = state.lhTestResult,
+                        sexualActivity = state.sexualActivity
+                    )
+                }
 
                 _uiState.update { it.copy(isSaving = false, success = true) }
                 onSuccess()

@@ -40,11 +40,14 @@ private val navItems = listOf(
         selectedIcon = Icons.Filled.AddCircle,
         unselectedIcon = Icons.Outlined.AddCircle
     ),
+    // PHASE_6_7_PLAN.md §7.1 — Stories tab visible to both primaries and supporters.
+    // (MenuBook icon is deprecated for AutoMirrored variant; warning is fine
+    // and matches the existing icon usage in this file.)
     NavItem(
-        route = Screen.Messages.route,
-        label = "talk",
-        selectedIcon = Icons.Filled.Favorite,
-        unselectedIcon = Icons.Outlined.FavoriteBorder
+        route = Screen.Stories.route,
+        label = "stories",
+        selectedIcon = Icons.Filled.MenuBook,
+        unselectedIcon = Icons.Outlined.MenuBook
     ),
     NavItem(
         route = Screen.Settings.route,

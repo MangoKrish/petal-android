@@ -5,7 +5,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.petal.app.data.local.UserDao
+import com.petal.app.data.model.CycleMode
 import com.petal.app.data.model.User
+import com.petal.app.data.model.UserRole
 import com.petal.app.data.remote.AuthInterceptor
 import com.petal.app.data.remote.PetalApiService
 import com.petal.app.data.remote.dto.LoginRequest
@@ -49,7 +51,8 @@ class AuthRepository @Inject constructor(
         email: String,
         password: String,
         securityQuestion: String,
-        securityAnswer: String
+        securityAnswer: String,
+        role: UserRole = UserRole.Primary
     ): Result<User> = try {
         val response = apiService.register(
             RegisterRequest(
@@ -57,7 +60,8 @@ class AuthRepository @Inject constructor(
                 email = email.trim().lowercase(),
                 password = password,
                 securityQuestion = securityQuestion,
-                securityAnswer = securityAnswer
+                securityAnswer = securityAnswer,
+                role = role.display
             )
         )
         if (response.isSuccessful) {
@@ -66,7 +70,10 @@ class AuthRepository @Inject constructor(
                 id = body.userId,
                 name = body.name,
                 email = body.email,
-                createdAt = body.createdAt
+                createdAt = body.createdAt,
+                role = body.role ?: role.display,
+                username = body.username,
+                displayName = body.displayName ?: body.name
             )
             userDao.insertUser(user)
             authInterceptor.updateToken(body.token)
@@ -100,7 +107,10 @@ class AuthRepository @Inject constructor(
                 id = body.userId,
                 name = body.name,
                 email = body.email,
-                createdAt = body.createdAt
+                createdAt = body.createdAt,
+                role = body.role ?: "primary",
+                username = body.username,
+                displayName = body.displayName ?: body.name
             )
             userDao.insertUser(user)
             authInterceptor.updateToken(body.token)
@@ -173,6 +183,41 @@ class AuthRepository @Inject constructor(
         dataStore.edit { prefs ->
             prefs[ONBOARDING_COMPLETE_KEY] = true
         }
+    }
+
+    /** PHASE_6_7_PLAN.md §6A.2 — current user's cycle mode. Defaults to Tracking. */
+    suspend fun getCycleMode(): CycleMode {
+        val userId = getCurrentUserId() ?: return CycleMode.Tracking
+        return CycleMode.fromString(userDao.getCycleMode(userId))
+    }
+
+    suspend fun setCycleMode(mode: CycleMode) {
+        val userId = getCurrentUserId() ?: return
+        userDao.updateCycleMode(userId, mode.display)
+    }
+
+    /** PHASE_6_7_PLAN.md §6A.1 — role / handle / display name. */
+    suspend fun getRole(): UserRole {
+        val userId = getCurrentUserId() ?: return UserRole.Primary
+        return UserRole.fromString(userDao.getRole(userId))
+    }
+
+    suspend fun setRole(role: UserRole) {
+        val userId = getCurrentUserId() ?: return
+        userDao.updateRole(userId, role.display)
+    }
+
+    suspend fun setUsername(username: String) {
+        val userId = getCurrentUserId() ?: return
+        require(username.matches(Regex("^[a-z0-9_]{3,32}$"))) {
+            "Handle must be 3–32 lowercase letters, numbers, or underscores."
+        }
+        userDao.updateUsername(userId, username)
+    }
+
+    suspend fun setDisplayName(displayName: String) {
+        val userId = getCurrentUserId() ?: return
+        userDao.updateDisplayName(userId, displayName.take(50))
     }
 
     suspend fun deleteAccount() {

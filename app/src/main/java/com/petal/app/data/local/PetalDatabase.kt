@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.petal.app.data.model.CycleEntry
+import com.petal.app.data.model.DailyFertilityLog
 import com.petal.app.data.model.OnboardingData
 import com.petal.app.data.model.User
 
@@ -13,15 +14,17 @@ import com.petal.app.data.model.User
     entities = [
         User::class,
         CycleEntry::class,
-        OnboardingData::class
+        OnboardingData::class,
+        DailyFertilityLog::class
     ],
-    version = 1,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class PetalDatabase : RoomDatabase() {
     abstract fun cycleEntryDao(): CycleEntryDao
     abstract fun userDao(): UserDao
+    abstract fun dailyFertilityLogDao(): DailyFertilityLogDao
 
     companion object {
         const val DATABASE_NAME = "petal_database"

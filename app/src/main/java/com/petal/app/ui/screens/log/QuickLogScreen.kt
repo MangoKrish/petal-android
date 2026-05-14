@@ -42,6 +42,7 @@ fun QuickLogScreen(
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSymptomSheet by remember { mutableStateOf(false) }
+    var fertilityExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -275,6 +276,23 @@ fun QuickLogScreen(
                 MoodPicker(
                     selected = uiState.mood,
                     onSelect = { viewModel.updateMood(it) }
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                FertilitySection(
+                    expanded = fertilityExpanded,
+                    onToggleExpanded = { fertilityExpanded = !fertilityExpanded },
+                    temperature = uiState.temperatureC,
+                    cervicalMucus = uiState.cervicalMucus,
+                    ovulationPain = uiState.ovulationPain,
+                    lhTestResult = uiState.lhTestResult,
+                    sexualActivity = uiState.sexualActivity,
+                    onTemperatureChange = viewModel::updateTemperature,
+                    onMucusChange = viewModel::updateCervicalMucus,
+                    onOvulationPainChange = viewModel::updateOvulationPain,
+                    onLhTestChange = viewModel::updateLhTestResult,
+                    onSexualActivityChange = viewModel::updateSexualActivity
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))

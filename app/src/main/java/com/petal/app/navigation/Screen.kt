@@ -1,8 +1,11 @@
 package com.petal.app.navigation
 
 sealed class Screen(val route: String) {
+    data object RoleChooser : Screen("role_chooser")
     data object Login : Screen("login")
     data object SignUp : Screen("signup")
+    /** PHASE_6_7_PLAN.md §6A.1 — supporter shell home */
+    data object SupporterHome : Screen("supporter_home")
     data object ForgotPassword : Screen("forgot_password")
     data object Onboarding : Screen("onboarding")
     data object ImportData : Screen("import_data")
@@ -50,4 +53,13 @@ sealed class Screen(val route: String) {
 
     // Kawaii redesign: messaging
     data object Messages : Screen("messages")
+
+    // PHASE_6_7_PLAN.md §7.1
+    data object Stories : Screen("stories")
+
+    // PHASE_6_7_PLAN.md §6B.3 — friend groups
+    data object Groups : Screen("groups")
+    data object GroupDetail : Screen("groups/{id}") {
+        fun createRoute(id: String) = "groups/$id"
+    }
 }

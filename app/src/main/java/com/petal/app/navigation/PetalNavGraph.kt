@@ -22,7 +22,12 @@ import androidx.navigation.navArgument
 import com.petal.app.ui.components.BottomNavBar
 import com.petal.app.ui.screens.auth.ForgotPasswordScreen
 import com.petal.app.ui.screens.auth.LoginScreen
+import com.petal.app.ui.screens.auth.RoleChooserScreen
 import com.petal.app.ui.screens.auth.SignUpScreen
+import com.petal.app.ui.screens.groups.GroupDetailScreen
+import com.petal.app.ui.screens.groups.GroupsScreen
+import com.petal.app.ui.screens.partner.SupporterDashboardScreen
+import com.petal.app.ui.screens.stories.StoriesScreen
 import com.petal.app.ui.screens.calendar.CalendarScreen
 import com.petal.app.ui.screens.dashboard.DashboardScreen
 import com.petal.app.ui.screens.education.ArticleScreen
@@ -58,9 +63,14 @@ fun PetalNavGraph(
     val authViewModel: AuthViewModel = hiltViewModel()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState(initial = false)
     val hasOnboarded by authViewModel.hasOnboarded.collectAsState(initial = false)
+    val currentUser by authViewModel.currentUser.collectAsState(initial = null)
+    val isSupporter = currentUser?.role == "supporter"
 
+    // PHASE_6_7_PLAN.md §6A.1 — pre-auth role chooser is the default surface
+    // for first-time visitors. Supporters skip cycle onboarding entirely.
     val startDestination = when {
-        !isLoggedIn -> Screen.Login.route
+        !isLoggedIn -> Screen.RoleChooser.route
+        isSupporter -> Screen.SupporterHome.route
         !hasOnboarded -> Screen.Onboarding.route
         else -> Screen.Dashboard.route
     }
@@ -79,7 +89,9 @@ fun PetalNavGraph(
         Screen.QuickLog.baseRoute,
         Screen.Partner.route,
         Screen.Messages.route,
-        Screen.Settings.route
+        Screen.Settings.route,
+        Screen.SupporterHome.route,
+        Screen.Stories.route
     )
 
     val navContent: @Composable (Modifier) -> Unit = { modifier ->
@@ -112,12 +124,28 @@ fun PetalNavGraph(
                     )
             }
         ) {
+            // PHASE_6_7_PLAN.md §6A.1 — pre-auth role chooser
+            composable(Screen.RoleChooser.route) {
+                RoleChooserScreen(
+                    onContinueToSignup = { navController.navigate(Screen.SignUp.route) }
+                )
+            }
+
+            // Supporter shell home — routed to immediately after a supporter
+            // signs up / logs in, instead of cycle onboarding.
+            composable(Screen.SupporterHome.route) {
+                SupporterDashboardScreen()
+            }
+
             // Auth
             composable(Screen.Login.route) {
                 LoginScreen(
                     onNavigateToSignUp = { navController.navigate(Screen.SignUp.route) },
                     onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) },
                     onLoginSuccess = {
+                        // After login, the startDestination recomputation will
+                        // route supporters to SupporterHome and primaries to
+                        // Onboarding/Dashboard. Just clear back stack.
                         navController.navigate(Screen.Dashboard.route) {
                             popUpTo(0) { inclusive = true }
                         }
@@ -128,7 +156,10 @@ fun PetalNavGraph(
                 SignUpScreen(
                     onNavigateBack = { navController.popBackStack() },
                     onSignUpSuccess = {
-                        navController.navigate(Screen.Onboarding.route) {
+                        // After signup, role determines the next screen.
+                        val nextRoute = if (authViewModel.uiState.value.user?.role == "supporter")
+                            Screen.SupporterHome.route else Screen.Onboarding.route
+                        navController.navigate(nextRoute) {
                             popUpTo(0) { inclusive = true }
                         }
                     }
@@ -288,6 +319,7 @@ fun PetalNavGraph(
                     onNavigateToReferral = { navController.navigate(Screen.Referral.route) },
                     onNavigateToJournal = { navController.navigate(Screen.Journal.route) },
                     onNavigateToAchievements = { navController.navigate(Screen.Achievements.route) },
+                    onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
@@ -351,6 +383,27 @@ fun PetalNavGraph(
                 SoftTalksScreen(
                     currentUserId = user?.id ?: "",
                     isOnPeriod = false,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // PHASE_6_7_PLAN.md §7.1 — Stories tab. Visible to both primary
+            // and supporter shells; reachable from the bottom-nav.
+            composable(Screen.Stories.route) {
+                StoriesScreen(onNavigateBack = { navController.popBackStack() })
+            }
+
+            // PHASE_6_7_PLAN.md §6B.3 — friend groups + wellness scoreboard.
+            composable(Screen.Groups.route) {
+                GroupsScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onOpenGroup = { id -> navController.navigate(Screen.GroupDetail.createRoute(id)) }
+                )
+            }
+            composable(Screen.GroupDetail.route) { backStackEntry ->
+                val groupId = backStackEntry.arguments?.getString("id") ?: return@composable
+                GroupDetailScreen(
+                    groupId = groupId,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

@@ -11,8 +11,27 @@ data class User(
     val email: String,
     val dateOfBirth: String? = null,
     val createdAt: String,
-    val isPartnerAccount: Boolean = false
+    val isPartnerAccount: Boolean = false,
+    /** PHASE_6_7_PLAN.md §6A.2 — "tracking" | "ttc" | "avoiding". Default "tracking". */
+    val cycleMode: String = "tracking",
+    /** PHASE_6_7_PLAN.md §6A.1 — "primary" | "supporter". Default "primary". */
+    val role: String = "primary",
+    /** Soft-default handle (e.g. "softpetal_4172"). Nullable for legacy rows. */
+    val username: String? = null,
+    /** Display name shown to other users; falls back to `name` if null. */
+    val displayName: String? = null
 )
+
+@Serializable
+enum class UserRole(val display: String) {
+    Primary("primary"),
+    Supporter("supporter");
+
+    companion object {
+        fun fromString(value: String?): UserRole =
+            entries.firstOrNull { it.display == value } ?: Primary
+    }
+}
 
 @Serializable
 data class Session(

@@ -10,7 +10,9 @@ data class RegisterRequest(
     val email: String,
     val password: String,
     val securityQuestion: String = "",
-    val securityAnswer: String = ""
+    val securityAnswer: String = "",
+    /** PHASE_6_7_PLAN.md §6A.1 — "primary" | "supporter". Default "primary". */
+    val role: String? = null
 )
 
 @Serializable
@@ -26,7 +28,11 @@ data class AuthResponse(
     val email: String,
     val token: String,
     val sessionId: String,
-    val createdAt: String
+    val createdAt: String,
+    /** Returned by API on signup/register (PHASE_6_7_PLAN.md §6A.1). */
+    val role: String? = null,
+    val username: String? = null,
+    val displayName: String? = null
 )
 
 @Serializable
@@ -272,6 +278,107 @@ data class MarkReadResponse(
 data class ApiEnvelope<T>(
     val success: Boolean,
     val data: T? = null
+)
+
+// ---- Moderation (PHASE_6_7_PLAN.md §6B.1) ----
+
+@Serializable
+data class BlockedUserDto(
+    val id: String,
+    val blockedUserId: String,
+    val username: String? = null,
+    val displayName: String? = null,
+    val blockedAt: String,
+)
+
+@Serializable
+data class BlockHandleRequest(
+    val username: String,
+)
+
+@Serializable
+data class ReportRequest(
+    /** snake_case identifier — e.g. "handle", "partner_connection", "story_share" */
+    val context: String,
+    val reason: String,
+    val details: String? = null,
+    val reportedUsername: String? = null,
+    val reportedUserId: String? = null,
+)
+
+@Serializable
+data class ReportSubmittedDto(
+    val id: String,
+    val status: String,
+    val createdAt: String,
+)
+
+// ---- Friend groups (PHASE_6_7_PLAN.md §6B.3) ----
+
+@Serializable
+data class FriendGroupSummaryDto(
+    val id: String,
+    val name: String,
+    val emoji: String? = null,
+    val joinCode: String,
+    val createdBy: String? = null,
+    val createdAt: String,
+    val maxMembers: Int,
+    val memberCount: Int,
+    val myShareLevel: String,
+    val myReceiveUnwellPings: Boolean,
+)
+
+@Serializable
+data class FriendGroupMemberDto(
+    val userId: String,
+    val username: String? = null,
+    val displayName: String? = null,
+    val joinedAt: String,
+    val shareLevel: String,
+    val receiveUnwellPings: Boolean,
+)
+
+@Serializable
+data class ScoreboardEntryDto(
+    val userId: String,
+    val username: String? = null,
+    val displayName: String? = null,
+    val hydrationScore: Int,
+    val sleepScore: Int,
+    val exerciseScore: Int,
+    val totalScore: Int,
+    val hydrationStreakDays: Int,
+    val avgSleepHours: Double,
+    val totalExerciseMinutes: Int,
+)
+
+@Serializable
+data class CreateGroupRequest(
+    val name: String,
+    val emoji: String? = null,
+)
+
+@Serializable
+data class JoinGroupRequest(
+    val joinCode: String,
+)
+
+@Serializable
+data class PatchMembershipRequest(
+    val shareLevel: String? = null,
+    val receiveUnwellPings: Boolean? = null,
+)
+
+@Serializable
+data class UnwellPingRequest(
+    val message: String? = null,
+)
+
+@Serializable
+data class UnwellPingResponseDto(
+    val id: String,
+    val recipientCount: Int,
 )
 
 // ---- Notifications / device registration ----

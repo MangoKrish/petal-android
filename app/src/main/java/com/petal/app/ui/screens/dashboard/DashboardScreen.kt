@@ -176,7 +176,13 @@ fun DashboardScreen(
                     ovulationDate = uiState.ovulationDate,
                     fertileWindowStart = uiState.fertileWindowStart,
                     fertileWindowEnd = uiState.fertileWindowEnd,
-                    confidence = uiState.confidence
+                    confidence = uiState.confidence,
+                    cycleMode = uiState.cycleMode,
+                    peakDay = uiState.peakDay,
+                    fusionSource = uiState.fusionSource,
+                    phaseToday = uiState.phaseToday,
+                    irregular = uiState.irregular,
+                    insufficientFertilityData = uiState.insufficientFertilityData
                 )
             }
 

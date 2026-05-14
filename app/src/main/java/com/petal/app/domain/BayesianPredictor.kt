@@ -46,8 +46,11 @@ class BayesianPredictor @Inject constructor() {
         const val HEADACHE_ADJUSTMENT = -0.15
         /** Damping factor for cycle-length trend following. */
         const val TREND_DAMPING_FACTOR = 0.3
-        /** Maximum total symptom adjustment (days). */
-        const val MAX_SYMPTOM_ADJUSTMENT = 1.5
+        /** Maximum total symptom adjustment (days). Matches web bayesian.ts MAX_SYMPTOM_ADJUSTMENT_DAYS. */
+        const val MAX_SYMPTOM_ADJUSTMENT = 2.0
+
+        /** Exponential decay base — newer cycles weigh more. Matches web/API DECAY_LAMBDA. */
+        const val DECAY_LAMBDA = 0.85
 
         // ---- Temperature trend detection ----
         /** Fraction of readings used as baseline. */
@@ -59,13 +62,16 @@ class BayesianPredictor @Inject constructor() {
         const val TEMP_RISE_SENSITIVITY = 0.1
 
         // ---- Confidence scoring ----
-        /** Observation factor saturation constant (saturates around 8-10 cycles). */
-        const val CONFIDENCE_OBS_SCALE = 4.0
-        /** Maximum posterior std before confidence drops to zero. */
-        const val CONFIDENCE_STD_CEILING = 5.0
-        /** Weight given to observation count vs precision in combined score. */
-        const val CONFIDENCE_OBS_WEIGHT = 0.4
-        const val CONFIDENCE_PRECISION_WEIGHT = 0.6
+        // Kept in lockstep with new-project/src/utils/bayesian.ts and
+        // PetalAPI/src/services/predictionService.ts. Change all three together.
+        /** Number of cycles at which the data factor saturates to 1.0. */
+        const val CONFIDENCE_OBS_SATURATION = 6.0
+        /** Equal weighting of data quantity and posterior precision. */
+        const val CONFIDENCE_OBS_WEIGHT = 0.5
+        const val CONFIDENCE_PRECISION_WEIGHT = 0.5
+        /** Floor / ceiling on reported confidence. */
+        const val CONFIDENCE_FLOOR = 0.1
+        const val CONFIDENCE_CEILING = 0.99
     }
 
     private val priorMean: Double = PRIOR_MEAN
@@ -97,7 +103,10 @@ class BayesianPredictor @Inject constructor() {
         symptoms: Symptoms? = null,
         lastPeriodStart: LocalDate? = null
     ): PredictionResult {
-        val (posteriorMean, posteriorVariance) = computePosterior(cycles)
+        // Cycles arrive newest-first from the repository; apply exponential
+        // decay weights so the most recent cycles dominate.
+        val weights = decayWeights(cycles.size)
+        val (posteriorMean, posteriorVariance) = computePosteriorWeighted(cycles, weights)
 
         // Apply symptom-aware adjustment
         val adjustedMean = if (symptoms != null) {
@@ -113,8 +122,8 @@ class BayesianPredictor @Inject constructor() {
         val lowerBound = max(MIN_CYCLE_LENGTH, adjustedMean - z95 * posteriorStd)
         val upperBound = min(MAX_CYCLE_LENGTH, adjustedMean + z95 * posteriorStd)
 
-        // Compute confidence score (0-1) based on posterior std and number of observations
-        val confidence = computeConfidence(cycles.size, posteriorStd)
+        // Compute confidence score (0-1) — same formula as web + API.
+        val confidence = computeConfidence(cycles.size, posteriorVariance)
 
         // Prediction dates
         val anchor = lastPeriodStart ?: if (cycles.isNotEmpty()) {
@@ -154,41 +163,53 @@ class BayesianPredictor @Inject constructor() {
     }
 
     /**
-     * Normal-normal conjugate posterior update.
+     * Normal-normal conjugate posterior update with uniform weights.
      * Returns (posteriorMean, posteriorVariance).
      */
-    private fun computePosterior(cycles: List<CycleLog>): Pair<Double, Double> {
-        if (cycles.isEmpty()) {
-            return Pair(priorMean, priorVariance)
-        }
+    fun computePosterior(cycles: List<CycleLog>): Pair<Double, Double> =
+        computePosteriorWeighted(cycles, List(cycles.size) { 1.0 })
 
-        val n = cycles.size
+    /**
+     * Weighted normal-normal conjugate posterior. observations[i] aligns with
+     * weights[i]. Total weight replaces n in the precision update.
+     * Returns (posteriorMean, posteriorVariance).
+     */
+    fun computePosteriorWeighted(
+        cycles: List<CycleLog>,
+        weights: List<Double>
+    ): Pair<Double, Double> {
+        if (cycles.isEmpty()) return Pair(priorMean, priorVariance)
+        require(cycles.size == weights.size) {
+            "computePosteriorWeighted: cycles and weights must align"
+        }
+        val totalWeight = weights.sum()
+        if (totalWeight <= 0.0) return Pair(priorMean, priorVariance)
+
         val lengths = cycles.map { it.cycleLength.toDouble() }
-        val dataMean = lengths.average()
+        val weightedMean = lengths.zip(weights).sumOf { (x, w) -> x * w } / totalWeight
 
-        // Estimate data variance (sample variance with Bessel's correction, min 1.0)
-        val dataVariance = if (n >= 2) {
-            val sumSqDiff = lengths.sumOf { (it - dataMean).pow(2) }
-            max(1.0, sumSqDiff / (n - 1))
+        // Weighted sample variance with Bessel-style correction.
+        val dataVariance = if (cycles.size >= 2) {
+            val sumSqDiff = lengths.zip(weights).sumOf { (x, w) -> w * (x - weightedMean).pow(2) }
+            max(1.0, sumSqDiff / max(1.0, totalWeight - 1.0))
         } else {
-            priorVariance // Use prior variance for single observation
+            priorVariance
         }
 
-        // Precision = 1 / variance
         val priorPrecision = 1.0 / priorVariance
         val dataPrecision = 1.0 / dataVariance
-
-        // Posterior precision = prior precision + n * data precision
-        val posteriorPrecision = priorPrecision + n * dataPrecision
-
-        // Posterior mean = weighted combination
-        val posteriorMean = (priorPrecision * priorMean + n * dataPrecision * dataMean) / posteriorPrecision
-
-        // Posterior variance = 1 / posterior precision
-        val posteriorVariance = 1.0 / posteriorPrecision
-
-        return Pair(posteriorMean, posteriorVariance)
+        val posteriorPrecision = priorPrecision + totalWeight * dataPrecision
+        val posteriorMean = (priorPrecision * priorMean + totalWeight * dataPrecision * weightedMean) / posteriorPrecision
+        return Pair(posteriorMean, 1.0 / posteriorPrecision)
     }
+
+    /**
+     * Builds exponential-decay weights for a cycle list assumed to be ordered
+     * newest-first (index 0 = most recent). Weight at index i is λ^i.
+     * Mirrors web/API decayWeights.
+     */
+    fun decayWeights(n: Int, lambda: Double = DECAY_LAMBDA): List<Double> =
+        (0 until n).map { lambda.pow(it) }
 
     /**
      * Adjusts the predicted cycle length based on symptom signals.
@@ -293,17 +314,16 @@ class BayesianPredictor @Inject constructor() {
     }
 
     /**
-     * Computes a confidence score from 0.0 to 1.0.
-     * More observations and lower posterior std = higher confidence.
+     * Computes a confidence score from CONFIDENCE_FLOOR to CONFIDENCE_CEILING.
+     * Mirrors the formula in new-project/src/utils/bayesian.ts and
+     * PetalAPI/src/services/predictionService.ts so all three clients agree.
      */
-    private fun computeConfidence(numObservations: Int, posteriorStd: Double): Double {
-        val observationFactor = 1.0 - exp(-numObservations / CONFIDENCE_OBS_SCALE)
-
-        val precisionFactor = max(0.0, 1.0 - posteriorStd / CONFIDENCE_STD_CEILING)
-
-        val combined = CONFIDENCE_OBS_WEIGHT * observationFactor + CONFIDENCE_PRECISION_WEIGHT * precisionFactor
-
-        return combined.coerceIn(0.0, 1.0)
+    fun computeConfidence(numObservations: Int, posteriorVariance: Double): Double {
+        val dataFactor = min(numObservations / CONFIDENCE_OBS_SATURATION, 1.0)
+        val varianceFactor = max(0.0, 1.0 - posteriorVariance / priorVariance)
+        val raw = CONFIDENCE_OBS_WEIGHT * dataFactor + CONFIDENCE_PRECISION_WEIGHT * varianceFactor
+        val clamped = raw.coerceIn(CONFIDENCE_FLOOR, CONFIDENCE_CEILING)
+        return (clamped * 100).roundToInt() / 100.0
     }
 
     /**

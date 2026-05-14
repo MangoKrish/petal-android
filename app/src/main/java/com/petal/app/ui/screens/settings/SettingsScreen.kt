@@ -29,6 +29,7 @@ fun SettingsScreen(
     onNavigateToReferral: () -> Unit = {},
     onNavigateToJournal: () -> Unit = {},
     onNavigateToAchievements: () -> Unit = {},
+    onNavigateToGroups: () -> Unit = {},
     onLogout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
@@ -123,6 +124,56 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Identity (PHASE_6_7_PLAN.md §6A.1) — role, handle, display name
+            Text(
+                "Identity",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            IdentitySettingsCard(
+                user = uiState.user,
+                onSwitchRole = viewModel::switchRole,
+                onUpdateUsername = viewModel::updateUsername,
+                onUpdateDisplayName = viewModel::updateDisplayName
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // PHASE_6_7_PLAN.md §6B.1 — block list
+            BlockedUsersSection()
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Cycle predictions (PHASE_6_7_PLAN.md §6A.2)
+            Text(
+                "Cycle predictions",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            CycleModeToggle(
+                selected = uiState.cycleMode,
+                onSelected = viewModel::updateCycleMode
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            PredictionTransparencyPanel(
+                cyclesUsed = uiState.cyclesUsed,
+                averageCycleLength = uiState.averageCycleLength,
+                minCycle = uiState.minCycle,
+                maxCycle = uiState.maxCycle,
+                nextPeriodSummary = uiState.nextPeriodSummary,
+                fertilityWindowSummary = uiState.fertilityWindowSummary,
+                cycleMode = uiState.cycleMode
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // Notifications & Sharing
             Text(
                 "Notifications & Sharing",
@@ -176,6 +227,14 @@ fun SettingsScreen(
                 title = "Refer Friends",
                 subtitle = "Share Petal, earn achievements",
                 onClick = onNavigateToReferral
+            )
+
+            // PHASE_6_7_PLAN.md §6B.3 — friend groups + wellness scoreboard
+            SettingsNavItem(
+                icon = Icons.Default.Groups,
+                title = "Friend groups",
+                subtitle = "Wellness scoreboard with people you trust",
+                onClick = onNavigateToGroups
             )
 
             SettingsNavItem(

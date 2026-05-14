@@ -37,7 +37,16 @@ data class PartnerUiState(
     val inviteEmail: String = "",
     val inviteNote: String = "",
     val isCaregiver: Boolean = false,
-    val isSending: Boolean = false
+    val isSending: Boolean = false,
+    /** PHASE_6_7_PLAN.md §6B.2 — invite-time permission picker. Defaults to
+     *  the "standard" profile (cycle dates + predictions). */
+    val invitePermissions: SharePermissions = SharePermissions(
+        latestPeriod = true,
+        cycleLength = true,
+        symptoms = false,
+        predictions = true,
+    ),
+    val savingConnectionId: String? = null
 )
 
 @HiltViewModel
@@ -173,7 +182,8 @@ class PartnerViewModel @Inject constructor(
                 name = state.inviteName,
                 email = state.inviteEmail,
                 note = state.inviteNote,
-                isCaregiver = state.isCaregiver
+                isCaregiver = state.isCaregiver,
+                permissions = state.invitePermissions
             )
 
             result.fold(
@@ -184,6 +194,34 @@ class PartnerViewModel @Inject constructor(
                 },
                 onFailure = { e ->
                     _uiState.update { it.copy(isSending = false, error = e.message) }
+                }
+            )
+        }
+    }
+
+    /** PHASE_6_7_PLAN.md §6B.2 — pre-send permission picker on the invite form. */
+    fun updateInvitePermissions(permissions: SharePermissions) {
+        _uiState.update { it.copy(invitePermissions = permissions) }
+    }
+
+    /** PHASE_6_7_PLAN.md §6B.2 — primary updates an existing connection's
+     *  permissions without revoking. */
+    fun updateConnectionPermissions(connectionId: String, permissions: SharePermissions) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(savingConnectionId = connectionId, error = null) }
+            val res = partnerRepository.updatePartnerConnection(
+                connectionId = connectionId,
+                permissions = permissions
+            )
+            res.fold(
+                onSuccess = {
+                    _uiState.update { it.copy(savingConnectionId = null) }
+                    loadPartnerData()
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(savingConnectionId = null, error = e.message ?: "Couldn't update permissions.")
+                    }
                 }
             )
         }

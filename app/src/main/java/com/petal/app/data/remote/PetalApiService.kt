@@ -74,6 +74,62 @@ interface PetalApiService {
     @DELETE("partner/connections/{id}")
     suspend fun removePartner(@Path("id") id: String): Response<Unit>
 
+    // PHASE_6_7_PLAN.md §6B.1 — block list + moderation reports
+    @GET("users/me/blocks")
+    suspend fun listBlocks(): Response<ApiEnvelope<List<BlockedUserDto>>>
+
+    @POST("users/me/blocks")
+    suspend fun blockHandle(@Body request: BlockHandleRequest): Response<ApiEnvelope<BlockedUserDto>>
+
+    @DELETE("users/me/blocks/{id}")
+    suspend fun removeBlock(@Path("id") id: String): Response<Unit>
+
+    @POST("reports")
+    suspend fun submitReport(@Body request: ReportRequest): Response<ApiEnvelope<ReportSubmittedDto>>
+
+    // PHASE_6_7_PLAN.md §6B.3 — friend groups
+    @GET("groups")
+    suspend fun listGroups(): Response<ApiEnvelope<List<FriendGroupSummaryDto>>>
+
+    @POST("groups")
+    suspend fun createGroup(@Body request: CreateGroupRequest): Response<ApiEnvelope<FriendGroupSummaryDto>>
+
+    @POST("groups/join")
+    suspend fun joinGroup(@Body request: JoinGroupRequest): Response<ApiEnvelope<FriendGroupSummaryDto>>
+
+    @GET("groups/{id}/members")
+    suspend fun listGroupMembers(@Path("id") id: String): Response<ApiEnvelope<List<FriendGroupMemberDto>>>
+
+    @GET("groups/{id}/scoreboard")
+    suspend fun getGroupScoreboard(
+        @Path("id") id: String,
+        @Query("range") range: String,
+    ): Response<ApiEnvelope<List<ScoreboardEntryDto>>>
+
+    @PATCH("groups/{id}/membership")
+    suspend fun updateGroupMembership(
+        @Path("id") id: String,
+        @Body request: PatchMembershipRequest,
+    ): Response<Unit>
+
+    @POST("groups/{id}/unwell")
+    suspend fun unwellPing(
+        @Path("id") id: String,
+        @Body request: UnwellPingRequest,
+    ): Response<ApiEnvelope<UnwellPingResponseDto>>
+
+    @POST("groups/{id}/leave")
+    suspend fun leaveGroup(@Path("id") id: String): Response<Unit>
+
+    @DELETE("groups/{id}")
+    suspend fun disbandGroup(@Path("id") id: String): Response<Unit>
+
+    @DELETE("groups/{id}/members/{userId}")
+    suspend fun removeGroupMember(
+        @Path("id") id: String,
+        @Path("userId") userId: String,
+    ): Response<Unit>
+
     // User
     @GET("user/profile")
     suspend fun getProfile(): Response<UserProfileDto>

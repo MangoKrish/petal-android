@@ -53,6 +53,18 @@ fun EducationScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
+            // PHASE_6_7_PLAN.md §6A.3 — swipeable card deck above the
+            // long-form sections; one idea per card with category filtering.
+            Text(
+                "Quick learn",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            EducationDeckSection()
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // Intro
             Text(
                 uiState.intro,

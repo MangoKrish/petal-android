@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -16,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.petal.app.ui.components.PetalButton
 import com.petal.app.ui.components.PetalCard
 import com.petal.app.ui.components.PetalTextField
+import com.petal.app.ui.components.ReportDialog
 import com.petal.app.ui.viewmodel.PartnerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -165,32 +167,65 @@ fun PartnerSetupScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 uiState.partnerConnections.forEach { connection ->
+                    var managing by rememberSaveable(connection.id) { mutableStateOf(false) }
+                    var reporting by rememberSaveable(connection.id) { mutableStateOf(false) }
+                    var pending by remember(connection.id, connection.permissions) {
+                        mutableStateOf(connection.permissions)
+                    }
                     PetalCard {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    connection.partnerName,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Text(
-                                    connection.partnerEmail,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    "${connection.status.display}${if (connection.isCaregiver) " (Caregiver)" else ""}",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        connection.partnerName,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Text(
+                                        connection.partnerEmail,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        "${connection.status.display}${if (connection.isCaregiver) " (Caregiver)" else ""}",
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                                TextButton(onClick = { reporting = true }) {
+                                    Text("Report")
+                                }
+                                TextButton(onClick = { managing = !managing }) {
+                                    Text(if (managing) "Close" else "Manage")
+                                }
+                                IconButton(onClick = { viewModel.removePartner(connection.id) }) {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = "Remove",
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             }
-                            IconButton(onClick = { viewModel.removePartner(connection.id) }) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = "Remove",
-                                    tint = MaterialTheme.colorScheme.error
+
+                            // PHASE_6_7_PLAN.md §6B.1 — Report dialog mounted
+                            // per row so the report carries the connection's
+                            // identity automatically.
+                            ReportDialog(
+                                open = reporting,
+                                context = "partner_connection",
+                                subjectLabel = connection.partnerName,
+                                onDismiss = { reporting = false },
+                            )
+
+                            if (managing) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                // PHASE_6_7_PLAN.md §6B.2 — per-connection permission editor.
+                                PartnerPermissionEditor(
+                                    permissions = pending,
+                                    onChange = { pending = it },
+                                    onSave = {
+                                        viewModel.updateConnectionPermissions(connection.id, pending)
+                                    },
+                                    isSaving = uiState.savingConnectionId == connection.id
                                 )
                             }
                         }
