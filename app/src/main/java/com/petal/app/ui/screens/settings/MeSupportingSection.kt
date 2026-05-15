@@ -1,11 +1,9 @@
 package com.petal.app.ui.screens.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,11 +19,15 @@ import com.petal.app.ui.components.PetalCard
  * Renders nothing when the list is empty — keeps the Me tab clean for the
  * common case. The full dedicated supporter shell at SupporterDashboardScreen
  * is unchanged; this is a lighter row-style variant scoped to Settings.
+ *
+ * TODO: rows are intentionally non-interactive — a supporter-facing partner
+ * dashboard surface doesn't exist yet, and routing into the primary-facing
+ * partner view would just show the user their own data. Wire up tap →
+ * "view this primary's shared data" once that surface lands.
  */
 @Composable
 fun MeSupportingSection(
     connections: List<SupportingConnection>,
-    onOpenConnection: (connectionId: String) -> Unit = {},
 ) {
     if (connections.isEmpty()) return
 
@@ -47,27 +49,18 @@ fun MeSupportingSection(
             Spacer(modifier = Modifier.height(12.dp))
 
             connections.forEach { c ->
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onOpenConnection(c.connectionId) }
-                        .padding(vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(vertical = 10.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            c.primaryName,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            c.roleLabel ?: "your person",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                     Text(
-                        "open ›",
+                        c.primaryName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        c.roleLabel ?: "your person",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
