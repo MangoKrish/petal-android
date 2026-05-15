@@ -52,14 +52,9 @@ class BayesianPredictor @Inject constructor() {
         /** Exponential decay base — newer cycles weigh more. Matches web/API DECAY_LAMBDA. */
         const val DECAY_LAMBDA = 0.85
 
-        // ---- Temperature trend detection ----
-        /** Fraction of readings used as baseline. */
-        const val TEMP_BASELINE_FRACTION = 0.6
-        /** Minimum temperature shift (degrees C) to indicate post-ovulation. */
-        const val TEMP_SHIFT_THRESHOLD = 0.2
-        /** Minimum readings above baseline to confirm sustained rise. */
-        const val TEMP_SUSTAINED_RISE_MIN = 3
-        const val TEMP_RISE_SENSITIVITY = 0.1
+        // BBT / temperature trend detection now lives in FertilityFusion.detectBbtShift —
+        // see PHASE_6_7_PLAN.md §6A.2. The duplicated logic that used to live here was
+        // removed so there's a single source of truth for ovulation confirmation.
 
         // ---- Confidence scoring ----
         // Kept in lockstep with new-project/src/utils/bayesian.ts and
@@ -279,38 +274,6 @@ class BayesianPredictor @Inject constructor() {
         }
 
         return if (denominator > 0) numerator / denominator else 0.0
-    }
-
-    /**
-     * Detects temperature trends from a series of basal body temperature readings.
-     * A sustained rise of ~0.2-0.5 degrees C indicates ovulation has occurred.
-     *
-     * Returns:
-     * - "pre_ovulation" if no sustained rise detected
-     * - "post_ovulation" if a thermal shift is detected
-     * - "insufficient_data" if not enough readings
-     */
-    fun detectTemperatureTrend(temperatures: List<Double>): String {
-        if (temperatures.size < 6) return "insufficient_data"
-
-        // Split into baseline and recent portions
-        val splitPoint = (temperatures.size * TEMP_BASELINE_FRACTION).toInt()
-        val baseline = temperatures.take(splitPoint)
-        val recent = temperatures.drop(splitPoint)
-
-        if (baseline.isEmpty() || recent.isEmpty()) return "insufficient_data"
-
-        val baselineMean = baseline.average()
-        val recentMean = recent.average()
-
-        val shift = recentMean - baselineMean
-        val sustainedRise = recent.count { it > baselineMean + TEMP_RISE_SENSITIVITY }
-
-        return if (shift >= TEMP_SHIFT_THRESHOLD && sustainedRise >= TEMP_SUSTAINED_RISE_MIN) {
-            "post_ovulation"
-        } else {
-            "pre_ovulation"
-        }
     }
 
     /**
