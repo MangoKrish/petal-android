@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.petal.app.BuildConfig
 import com.petal.app.ui.components.GlassCard
 import com.petal.app.ui.theme.*
 import kotlinx.coroutines.delay
@@ -139,7 +140,7 @@ fun ReferralScreen(
                                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                     type = "text/plain"
                                     putExtra(Intent.EXTRA_TEXT,
-                                        "Track your cycle with Petal! Use my referral code $referralCode when you sign up. Download at https://petal-web-mangokrishs-projects.vercel.app"
+                                        "Track your cycle with Petal! Use my referral code $referralCode when you sign up. Download at ${BuildConfig.WEB_BASE_URL}"
                                     )
                                 }
                                 context.startActivity(Intent.createChooser(shareIntent, "Share Petal"))

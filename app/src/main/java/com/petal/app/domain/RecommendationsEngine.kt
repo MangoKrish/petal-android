@@ -207,5 +207,5 @@ class RecommendationsEngine @Inject constructor() {
     )
 
     fun getRecommendations(phase: String): PhaseRecommendations =
-        data[phase] ?: data["Follicular"]!!
+        data[phase] ?: data.getValue("Follicular")
 }

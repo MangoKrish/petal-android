@@ -67,7 +67,8 @@ class PartnerRepository @Inject constructor(
             )
         )
         if (response.isSuccessful) {
-            val dto = response.body()!!
+            val dto = response.body()
+                ?: throw Exception("Empty response from server. Please try again.")
             Result.success(
                 PartnerConnection(
                     id = dto.id,
@@ -182,7 +183,8 @@ class PartnerRepository @Inject constructor(
             CreateShareLinkRequest(label, showCycleLength, showNextPeriod, showSymptoms, showPhase)
         )
         if (response.isSuccessful) {
-            val dto = response.body()!!
+            val dto = response.body()
+                ?: throw Exception("Empty response from server. Please try again.")
             Result.success(
                 SharedLink(
                     id = dto.id,

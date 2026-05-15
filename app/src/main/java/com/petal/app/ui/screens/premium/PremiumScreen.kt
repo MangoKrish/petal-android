@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.petal.app.BuildConfig
 import com.petal.app.ui.components.GlassCard
 import com.petal.app.ui.theme.*
 
@@ -203,8 +204,7 @@ fun PremiumScreen(
 }
 
 private fun openStripeCheckout(context: Context) {
-    val baseUrl = "https://petal-web-mangokrishs-projects.vercel.app"
-    val checkoutUrl = "$baseUrl/?view=settings&premium=checkout"
+    val checkoutUrl = "${BuildConfig.WEB_BASE_URL}/?view=settings&premium=checkout"
 
     try {
         val customTabsIntent = CustomTabsIntent.Builder()

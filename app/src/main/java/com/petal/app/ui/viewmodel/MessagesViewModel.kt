@@ -73,18 +73,25 @@ class MessagesViewModel @Inject constructor(
     private suspend fun refreshMessages() {
         val r = repo.listMessages()
         r.onSuccess { fresh ->
-            val incoming = fresh.filter { it.senderId != _state.value.currentUserId && it.id !in seenIds }
-            seenIds.addAll(fresh.map { it.id })
-            val next = _state.value.copy(
-                messages = fresh,
-                isLoading = false,
-                error = null,
-                newIds = if (!firstLoad) incoming.map { it.id }.toSet() else emptySet(),
-                playPing = if (!firstLoad && incoming.isNotEmpty() && _state.value.soundOn)
-                    System.currentTimeMillis() else _state.value.playPing,
-            )
-            _state.value = next
+            // Compute the new-id and ping fields outside the update, then apply
+            // atomically — prior code read _state.value three times and wrote
+            // back a copy, which loses concurrent updates (e.g. an optimistic
+            // send firing during the refresh).
+            val isFirst = firstLoad
             firstLoad = false
+            val freshIds = fresh.map { it.id }
+            _state.update { current ->
+                val incoming = fresh.filter { it.senderId != current.currentUserId && it.id !in seenIds }
+                seenIds.addAll(freshIds)
+                current.copy(
+                    messages = fresh,
+                    isLoading = false,
+                    error = null,
+                    newIds = if (!isFirst) incoming.map { it.id }.toSet() else emptySet(),
+                    playPing = if (!isFirst && incoming.isNotEmpty() && current.soundOn)
+                        System.currentTimeMillis() else current.playPing,
+                )
+            }
         }.onFailure { e ->
             _state.update { it.copy(isLoading = false, error = e.message) }
         }

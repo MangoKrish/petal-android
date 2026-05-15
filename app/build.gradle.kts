@@ -22,6 +22,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "API_BASE_URL", "\"https://petal-api-mangokrishs-projects.vercel.app/api/v1/\"")
+        buildConfigField("String", "WEB_BASE_URL", "\"https://petal-web-mangokrishs-projects.vercel.app\"")
     }
 
     signingConfigs {

@@ -16,8 +16,8 @@ import kotlin.math.*
  * - Likelihood: user's observed cycle lengths
  * - Posterior: updated belief about user's true cycle length
  *
- * Also incorporates symptom-aware adjustments and temperature trend detection
- * for more accurate predictions with additional data signals.
+ * Symptom-aware adjustments shift the posterior mean slightly. BBT / ovulation
+ * confirmation lives in [FertilityFusion] — see PHASE_6_7_PLAN.md §6A.2.
  */
 @Singleton
 class BayesianPredictor @Inject constructor() {

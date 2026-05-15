@@ -65,7 +65,8 @@ class AuthRepository @Inject constructor(
             )
         )
         if (response.isSuccessful) {
-            val body = response.body()!!
+            val body = response.body()
+                ?: throw Exception("Empty response from server. Please try again.")
             val user = User(
                 id = body.userId,
                 name = body.name,
@@ -102,7 +103,8 @@ class AuthRepository @Inject constructor(
             LoginRequest(email = email.trim().lowercase(), password = password)
         )
         if (response.isSuccessful) {
-            val body = response.body()!!
+            val body = response.body()
+                ?: throw Exception("Empty response from server. Please try again.")
             val user = User(
                 id = body.userId,
                 name = body.name,
@@ -150,7 +152,9 @@ class AuthRepository @Inject constructor(
     suspend fun getSecurityQuestion(email: String): Result<String> = try {
         val response = apiService.forgotPassword(ForgotPasswordRequest(email.trim().lowercase()))
         if (response.isSuccessful) {
-            Result.success(response.body()!!.securityQuestion)
+            val q = response.body()?.securityQuestion
+                ?: throw Exception("Empty response from server. Please try again.")
+            Result.success(q)
         } else {
             Result.failure(Exception("No account found with that email."))
         }
