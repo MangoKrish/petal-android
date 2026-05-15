@@ -48,7 +48,12 @@ class MessagesViewModel @Inject constructor(
 
     fun setSoundOn(on: Boolean) = _state.update { it.copy(soundOn = on) }
 
-    fun setDraft(value: String) = _state.update { it.copy(draft = value) }
+    // Match the PetalAPI cap (routes/messages.ts: content max 2000). Capping
+    // on input prevents the server from rejecting a long paste mid-send, and
+    // keeps the editor responsive (very long strings re-layout on every keystroke).
+    fun setDraft(value: String) = _state.update {
+        it.copy(draft = if (value.length > 2000) value.take(2000) else value)
+    }
 
     private fun loadThread() = viewModelScope.launch {
         val r = repo.getThread()
