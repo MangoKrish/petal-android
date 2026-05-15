@@ -12,6 +12,7 @@ import com.petal.app.data.model.CycleMode
 import com.petal.app.data.model.NotificationPreferences
 import com.petal.app.data.model.ReminderFrequency
 import com.petal.app.data.model.SharedLink
+import com.petal.app.data.model.SupportingConnection
 import com.petal.app.data.model.User
 import com.petal.app.data.model.UserRole
 import com.petal.app.data.repository.AuthRepository
@@ -42,6 +43,8 @@ data class SettingsUiState(
     val maxCycle: Int? = null,
     val nextPeriodSummary: String = "Log your first cycle to start predictions.",
     val fertilityWindowSummary: String? = null,
+    // PHASE_6_7_PLAN.md §6A.1 — primaries who also support someone see them here.
+    val supportingConnections: List<SupportingConnection> = emptyList(),
     val error: String? = null
 )
 
@@ -75,6 +78,7 @@ class SettingsViewModel @Inject constructor(
             val links = partnerRepository.getShareLinks().getOrNull() ?: emptyList()
             val cycleMode = authRepository.getCycleMode()
             val transparency = computeTransparency()
+            val supporting = partnerRepository.getSupportingConnections().getOrNull() ?: emptyList()
 
             dataStore.data.first().let { prefs ->
                 val notifPrefs = NotificationPreferences(
@@ -99,7 +103,8 @@ class SettingsViewModel @Inject constructor(
                         minCycle = transparency.minCycle,
                         maxCycle = transparency.maxCycle,
                         nextPeriodSummary = transparency.nextPeriodSummary,
-                        fertilityWindowSummary = transparency.fertilityWindowSummary
+                        fertilityWindowSummary = transparency.fertilityWindowSummary,
+                        supportingConnections = supporting
                     )
                 }
             }

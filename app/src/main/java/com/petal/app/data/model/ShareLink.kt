@@ -43,3 +43,16 @@ enum class PartnerStatus(val display: String) {
     Active("Active"),
     Paused("Paused");
 }
+
+/** PHASE_6_7_PLAN.md §6A.1 — connections where THIS user is the supporter,
+ *  for the Me-tab "also supporting" section on primaries.
+ *  Mirrors the web `listSupportingFor` row shape. */
+@Serializable
+data class SupportingConnection(
+    val connectionId: String,
+    val primaryUserId: String,
+    val primaryName: String,
+    val permissions: List<String> = emptyList(),
+    val roleLabel: String? = null,
+    val createdAt: String,
+)

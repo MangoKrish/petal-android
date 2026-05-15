@@ -74,6 +74,11 @@ interface PetalApiService {
     @DELETE("partner/connections/{id}")
     suspend fun removePartner(@Path("id") id: String): Response<Unit>
 
+    // PHASE_6_7_PLAN.md §6A.1 — primaries who are also supporting someone
+    // see them in the Me tab via this endpoint.
+    @GET("partner/supporting")
+    suspend fun getSupportingConnections(): Response<ApiEnvelope<List<SupportingConnectionDto>>>
+
     // PHASE_6_7_PLAN.md §6B.1 — block list + moderation reports
     @GET("users/me/blocks")
     suspend fun listBlocks(): Response<ApiEnvelope<List<BlockedUserDto>>>

@@ -164,4 +164,8 @@ dependencies {
     // Firebase Auth (for Google Sign-In)
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
+
+    // Unit tests — PHASE_6_7_PLAN.md §6A.2: bring the Android predictors under
+    // the same table-driven test coverage the web and API already have.
+    testImplementation(libs.junit)
 }

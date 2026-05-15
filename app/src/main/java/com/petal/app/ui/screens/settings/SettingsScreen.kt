@@ -140,6 +140,13 @@ fun SettingsScreen(
                 onUpdateDisplayName = viewModel::updateDisplayName
             )
 
+            // PHASE_6_7_PLAN.md §6A.1 — primaries who are also supporting
+            // someone see them here. Renders nothing when the list is empty.
+            if (uiState.supportingConnections.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                MeSupportingSection(connections = uiState.supportingConnections)
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             // PHASE_6_7_PLAN.md §6B.1 — block list

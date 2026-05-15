@@ -280,6 +280,19 @@ data class ApiEnvelope<T>(
     val data: T? = null
 )
 
+// ---- Supporting (PHASE_6_7_PLAN.md §6A.1) ----
+// Returned by GET /partner/supporting — the primaries this user is supporting.
+
+@Serializable
+data class SupportingConnectionDto(
+    val connectionId: String,
+    val primaryUserId: String,
+    val primaryName: String,
+    val permissions: List<String> = emptyList(),
+    val roleLabel: String? = null,
+    val createdAt: String,
+)
+
 // ---- Moderation (PHASE_6_7_PLAN.md §6B.1) ----
 
 @Serializable

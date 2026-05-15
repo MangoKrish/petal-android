@@ -23,6 +23,7 @@ material3-adaptive = "1.0.0"
 lottie = "6.3.0"
 firebase-bom = "33.7.0"
 google-services = "4.4.2"
+junit = "4.13.2"
 
 [libraries]
 # Compose BOM
@@ -105,6 +106,9 @@ compose-material3-window-size = { group = "androidx.compose.material3", name = "
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+
+# Test
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -4,6 +4,7 @@ import com.petal.app.data.model.PartnerConnection
 import com.petal.app.data.model.PartnerStatus
 import com.petal.app.data.model.SharePermissions
 import com.petal.app.data.model.SharedLink
+import com.petal.app.data.model.SupportingConnection
 import com.petal.app.data.remote.PetalApiService
 import com.petal.app.data.remote.dto.CreateShareLinkRequest
 import com.petal.app.data.remote.dto.InvitePartnerRequest
@@ -119,6 +120,29 @@ class PartnerRepository @Inject constructor(
         val response = apiService.removePartner(connectionId)
         if (response.isSuccessful) Result.success(Unit)
         else Result.failure(Exception("Failed to remove partner."))
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
+    /** PHASE_6_7_PLAN.md §6A.1 — primaries who are also supporting someone
+     *  fetch this list to render the Me-tab "also supporting" section. */
+    suspend fun getSupportingConnections(): Result<List<SupportingConnection>> = try {
+        val response = apiService.getSupportingConnections()
+        if (response.isSuccessful) {
+            val rows = response.body()?.data.orEmpty().map { dto ->
+                SupportingConnection(
+                    connectionId = dto.connectionId,
+                    primaryUserId = dto.primaryUserId,
+                    primaryName = dto.primaryName,
+                    permissions = dto.permissions,
+                    roleLabel = dto.roleLabel,
+                    createdAt = dto.createdAt,
+                )
+            }
+            Result.success(rows)
+        } else {
+            Result.failure(Exception("Failed to load supporting connections."))
+        }
     } catch (e: Exception) {
         Result.failure(e)
     }
